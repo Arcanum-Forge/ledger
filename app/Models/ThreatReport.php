@@ -3,32 +3,36 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasUniqueSlug;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\RouteKey;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[RouteKey('slug')]
+#[Fillable([
+    'slug',
+    'report_number',
+    'title',
+    'region_id',
+    'kingdom_id',
+    'type',
+    'level',
+    'status',
+    'sightings',
+    'description',
+])]
 class ThreatReport extends Model
 {
-    use HasFactory;
-    use HasUniqueSlug;
+    use HasFactory, HasUniqueSlug;
 
-    protected $fillable = [
-        'slug',
-        'report_number',
-        'title',
-        'region_id',
-        'kingdom_id',
-        'type',
-        'level',
-        'status',
-        'sightings',
-        'description',
-    ];
-
-    protected $casts = [
-        'sightings' => 'integer',
-        'level_severity' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'sightings' => 'integer',
+            'level_severity' => 'integer',
+        ];
+    }
 
     /** Severity order for the 'level' string — least severe first. */
     public const LEVELS = ['Elevated', 'Severe', 'Critical', 'Moderate'];
@@ -43,11 +47,6 @@ class ThreatReport extends Model
             $index = array_search($report->level, self::LEVELS, true);
             $report->level_severity = $index === false ? 0 : $index + 1;
         });
-    }
-
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
     }
 
     public function region(): BelongsTo

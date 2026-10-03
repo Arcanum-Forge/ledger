@@ -3,32 +3,37 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasUniqueSlug;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\RouteKey;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+
+#[RouteKey('slug')]
+#[Fillable([
+    'slug',
+    'title',
+    'excerpt',
+    'content',
+    'category',
+    'era',
+    'date',
+    'author_id',
+    'importance',
+    'confidential',
+])]
 class Record extends Model
 {
-    use HasFactory;
-    use HasUniqueSlug;
+    use HasFactory, HasUniqueSlug;
 
-    protected $fillable = [
-        'slug',
-        'title',
-        'excerpt',
-        'content',
-        'category',
-        'era',
-        'date',
-        'author_id',
-        'importance',
-        'confidential',
-    ];
-
-    protected $casts = [
-        'confidential' => 'boolean',
-        'importance_level' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'confidential' => 'boolean',
+            'importance_level' => 'integer',
+        ];
+    }
 
     /** Significance order for the 'importance' string — least significant first. */
     public const IMPORTANCE_LEVELS = ['Notable', 'Important', 'Critical'];
@@ -43,11 +48,6 @@ class Record extends Model
             $index = array_search($record->importance, self::IMPORTANCE_LEVELS, true);
             $record->importance_level = $index === false ? 0 : $index + 1;
         });
-    }
-
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
     }
 
     public function author(): BelongsTo
