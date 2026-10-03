@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\RouteKey;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 #[RouteKey('slug')]
 #[Fillable([
@@ -50,5 +51,17 @@ class Monster extends Model
     public function kingdom(): BelongsTo
     {
         return $this->belongsTo(Kingdom::class);
+    }
+
+    protected function threatColor(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => match ($this->threat) {
+                'Extreme' => 'text-[#c14545]',
+                'High' => 'text-[#b98967]',
+                'Moderate' => 'text-[#c59b4a]',
+                default => 'text-[#8f826b]',
+            },
+        );
     }
 }

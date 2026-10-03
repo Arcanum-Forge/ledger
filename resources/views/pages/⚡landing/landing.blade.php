@@ -93,7 +93,7 @@
 
                 <div class="grid border-l border-t border-[#302a20] sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($pillars as $pillar)
-                        <x-ledger.pillar-card :pillar="$pillar" />
+                        <x-landing.pillar-card :pillar="$pillar" />
                     @endforeach
                 </div>
             </div>

@@ -3,6 +3,6 @@
 use Livewire\Livewire;
 
 it('renders successfully', function () {
-    Livewire::test('auth.login')
+    Livewire::test('pages::auth.login')
         ->assertStatus(200);
 });

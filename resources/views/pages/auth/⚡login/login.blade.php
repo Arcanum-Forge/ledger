@@ -53,6 +53,10 @@
             <span wire:loading.remove wire:target="login">Enter</span>
             <span wire:loading wire:target="login">Verifying...</span>
         </button>
+
+        <a href="{{ route('landing') }}" wire:navigate
+            class="mt-4 inline-block text-[9px] uppercase tracking-[0.15em] text-[#625744] transition hover:text-[#c59b4a]">
+            ← Return to the Realm </a>
     </form>
 
 </div>

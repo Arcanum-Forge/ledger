@@ -10,13 +10,23 @@ use App\Models\Region;
 use App\Models\Ruler;
 use App\Models\ThreatReport;
 use App\Models\User;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
+use Illuminate\Support\Collection;
 
-new class extends Component {
+new
+    #[Title('Ledger - Dashboard')]
+    #[Layout('layouts.app')]
+    class extends Component {
 
-    public function render()
+    #[Computed]
+    public function stats(): array
     {
-        $stats = [
+        // sleep(3);
+
+        return [
             ['label' => 'Kingdoms', 'count' => Kingdom::count(), 'href' => '/kingdoms'],
             ['label' => 'Regions', 'count' => Region::count(), 'href' => '/regions'],
             ['label' => 'Rulers', 'count' => Ruler::count(), 'href' => '/rulers'],
@@ -28,47 +38,68 @@ new class extends Component {
             ['label' => 'Threat Reports', 'count' => ThreatReport::count(), 'href' => '/threat-reports'],
             ['label' => 'Users', 'count' => User::count(), 'href' => '/users'],
         ];
+    }
 
-        $activeThreats = ThreatReport::query()
+    #[Computed]
+    public function activeThreats(): Collection
+    {
+        // sleep(5);
+
+        return ThreatReport::query()
             ->with(['region', 'kingdom'])
             ->whereIn('status', ['Active', 'Investigating'])
             ->orderByDesc('level_severity')
             ->orderByDesc('sightings')
             ->limit(5)
             ->get();
+    }
 
-        $dangerousMonsters = Monster::query()
+    #[Computed]
+    public function dangerousMonsters(): Collection
+    {
+        // sleep(7);
+
+        return Monster::query()
             ->with('kingdom')
             ->orderByDesc('threat_level')
             ->orderByDesc('sightings')
             ->limit(5)
             ->get();
+    }
 
-        $recentRecords = Record::query()
+    #[Computed]
+    public function recentRecords(): Collection
+    {
+        // sleep(9);
+
+        return Record::query()
             ->with('author')
             ->latest()
             ->limit(5)
             ->get();
+    }
 
-        $risingFactions = Faction::query()
+    #[Computed]
+    public function risingFactions(): Collection
+    {
+        // sleep(11);
+
+        return Faction::query()
             ->with(['kingdom', 'leader'])
             ->orderByDesc('influence')
             ->limit(5)
             ->get();
+    }
 
-        $highestThreatKingdom = Kingdom::query()
+    #[Computed]
+    public function highestThreatKingdom(): ?Kingdom
+    {
+        // sleep(13);
+
+        return Kingdom::query()
             ->with('ruler')
             ->orderByDesc('threat')
             ->first();
-
-        return $this->view([
-            'stats' => $stats,
-            'activeThreats' => $activeThreats,
-            'dangerousMonsters' => $dangerousMonsters,
-            'recentRecords' => $recentRecords,
-            'risingFactions' => $risingFactions,
-            'highestThreatKingdom' => $highestThreatKingdom,
-        ]);
     }
 
 };
