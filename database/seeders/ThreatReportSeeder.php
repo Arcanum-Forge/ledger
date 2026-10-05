@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Kingdom;
+use App\Models\Monster;
 use App\Models\Region;
 use App\Models\ThreatReport;
 use Illuminate\Database\Seeder;
@@ -42,6 +43,7 @@ class ThreatReportSeeder extends Seeder
                 'slug' => 'blackfang-pack-sighted',
                 'report_number' => 'TR-0838',
                 'title' => 'Blackfang Pack Sighted',
+                'monsters' => ['Blackfang Wolf'],
                 'region' => 'Wyrmwood Frontier',
                 'kingdom' => 'Elaria',
                 'type' => 'Monster',
@@ -54,6 +56,7 @@ class ThreatReportSeeder extends Seeder
                 'slug' => 'uknown-figure-at-ravenwatch',
                 'report_number' => 'TR-0834',
                 'title' => 'Unknown Figure at Ravenwatch',
+                'monsters' => ['Veil Stalker'],
                 'region' => 'Ravenwatch Tower',
                 'kingdom' => 'Auren',
                 'type' => 'Unknown',
@@ -66,6 +69,7 @@ class ThreatReportSeeder extends Seeder
                 'slug' => 'graveborn-activity',
                 'report_number' => 'TR-0829',
                 'title' => 'Graveborn Activity',
+                'monsters' => ['Graveborn'],
                 'region' => "Old King's Road",
                 'kingdom' => 'Valedorn',
                 'type' => 'Undead',
@@ -90,6 +94,7 @@ class ThreatReportSeeder extends Seeder
                 'slug' => 'dragonfire-in-the-east',
                 'report_number' => 'TR-0816',
                 'title' => 'Dragonfire in the East',
+                'monsters' => ['Ash Drake'],
                 'region' => 'Ashen Peaks',
                 'kingdom' => 'Drakmor',
                 'type' => 'Dragon',
@@ -101,7 +106,7 @@ class ThreatReportSeeder extends Seeder
         ];
 
         foreach ($reports as $report) {
-            ThreatReport::create([
+            $created = ThreatReport::create([
                 'slug' => $report['slug'],
                 'report_number' => $report['report_number'],
                 'title' => $report['title'],
@@ -114,6 +119,9 @@ class ThreatReportSeeder extends Seeder
                 'sightings' => $report['sightings'],
                 'description' => $report['description'],
             ]);
+            $created->monsters()->sync(
+                 Monster::whereIn('name', $report['monsters'] ?? [])->pluck('id')
+            );
         }
     }
 }

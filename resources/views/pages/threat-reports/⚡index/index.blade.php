@@ -134,6 +134,9 @@
                                     <button wire:click="openView('{{ $report->slug }}')" wire:island="modal"
                                         class="text-left">
                                         <div class="font-serif text-sm text-parchment">{{ $report->title }}</div>
+                                        @if ($report->monsters->isNotEmpty())
+                                            <div class="mt-1 text-[10px] text-faint">{{ $report->monsters->pluck('name')->join(', ') }}</div>
+                                        @endif
                                     </button>
                                 </td>
 
@@ -263,6 +266,16 @@
                         </div>
                         <x-detail-item label="Status">{{ $this->selected->status }}</x-detail-item>
                         <x-detail-item label="Sightings">{{ $this->selected->sightings }}</x-detail-item>
+                        @if ($this->selected->monsters->isNotEmpty())
+                            <div class="col-span-2">
+                                <p class="text-[8px] uppercase tracking-[0.15em] text-faint">Monsters</p>
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    @foreach ($this->selected->monsters as $monster)
+                                        <span class="border border-line px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-parchment-dim">{{ $monster->name }}</span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     <div class="mt-8 flex gap-3">
@@ -328,7 +341,18 @@
                                     <p class="mt-1.5 text-[10px] text-danger">{{ $message }}</p>
                                 @enderror
                             </div>
+
+                            <div class="col-span-full">
+                                <x-multi-relation-picker label="Monsters" search-model="monsterFormSearch"
+                                    placeholder="Search monsters..." :options="$this->monsterFormResults"
+                                    :selected="$this->selectedMonsters" add-action="addMonster" remove-action="removeMonster" />
+                                @error('monsterIds.*')
+                                    <p class="mt-1.5 text-[10px] text-danger">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
+
+                        
 
                         <div class="grid grid-cols-3 gap-4">
                             <x-select-input model="type" label="Type" :options="$this->types" />

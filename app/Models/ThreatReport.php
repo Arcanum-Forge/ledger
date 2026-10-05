@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[RouteKey('slug')]
 #[Fillable([
@@ -38,11 +39,12 @@ class ThreatReport extends Model
 
     /** Severity order for the 'level' string — least severe first. */
     public const LEVELS = [
-        'Elevated' => 1,
-        'Severe' => 2,
-        'Critical' => 3,
-        'Moderate' => 4,
+        'Moderate' => 1,
+        'Elevated' => 2,
+        'Severe'   => 3,
+        'Critical' => 4,
     ];
+
 
     protected static function booted(): void
     {
@@ -60,6 +62,11 @@ class ThreatReport extends Model
     public function kingdom(): BelongsTo
     {
         return $this->belongsTo(Kingdom::class);
+    }
+
+    public function monsters(): BelongsToMany
+    {
+        return $this->belongsToMany(Monster::class);
     }
 
     protected function levelColor(): Attribute

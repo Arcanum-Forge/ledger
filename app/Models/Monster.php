@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[RouteKey('slug')]
 #[Fillable([
@@ -53,6 +54,11 @@ class Monster extends Model
     public function kingdom(): BelongsTo
     {
         return $this->belongsTo(Kingdom::class);
+    }
+
+    public function threatReports(): BelongsToMany
+    {
+        return $this->belongsToMany(ThreatReport::class);
     }
 
     protected function threatColor(): Attribute

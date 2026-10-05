@@ -14,6 +14,8 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\Monster;
+use Illuminate\Support\Facades\DB;
 
 new
     #[Title('Ledger — Threat Reports')]
@@ -98,6 +100,11 @@ new
 
         #[Url(history: true)]
         public string $sortDirection = 'desc';
+
+        // Monster multi-picker
+        public array $monsterIds = [];
+
+        public string $monsterFormSearch = '';
 
         /**
          * A report's location (Region) and the Kingdom it falls under — the
@@ -262,7 +269,7 @@ new
         public function reports(): CursorPaginator
         {
             return $this->filteredQuery()
-                ->with(['region', 'kingdom'])
+                ->with(['region', 'kingdom', 'monsters:id,name'])
                 ->orderBy($this->sortColumn(), $this->sortDirection)
                 ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
                 ->cursorPaginate(
@@ -318,6 +325,8 @@ new
                 'description' => ['nullable', 'string'],
                 'regionId' => ['nullable', 'exists:regions,id'],
                 'kingdomId' => ['nullable', 'exists:kingdoms,id'],
+                'monsterIds' => ['array', 'max:10'],
+                'monsterIds.*' => ['integer', 'exists:monsters,id'],
             ];
         }
 
@@ -354,19 +363,27 @@ new
         {
             $data = $this->validate();
 
+            $monsterIds = array_map('intval', $data['monsterIds'] ?? []);
+
             $data['report_number'] = $data['reportNumber'];
             $data['region_id'] = $data['regionId'] ?: null;
             $data['kingdom_id'] = $data['kingdomId'] ?: null;
-            unset($data['reportNumber'], $data['regionId'], $data['kingdomId']);
+            unset($data['reportNumber'], $data['regionId'], $data['kingdomId'], $data['monsterIds']);
 
-            if ($this->selected) {
-                $this->selected->update($data);
-                session()->flash('success', 'Threat report updated.');
-            } else {
-                $data['slug'] = ThreatReport::uniqueSlug($this->title);
-                ThreatReport::create($data);
-                session()->flash('success', 'Threat report added to the archive.');
-            }
+            DB::transaction(function () use ($data, $monsterIds) {
+                if ($this->selected) {
+                    $this->selected->update($data);
+                    $report = $this->selected;
+                    session()->flash('success', 'Threat report updated.');
+                } else {
+                    $data['slug'] = ThreatReport::uniqueSlug($this->title);
+                    $report = ThreatReport::create($data);
+                    session()->flash('success', 'Threat report added to the archive.');
+                }
+
+                $report->monsters()->sync($monsterIds);
+                $report->touch(); // pivot changes don't bump updated_at, and Servora syncs on it
+            });
 
             $this->closeModal();
             $this->refreshIslands();
@@ -388,7 +405,7 @@ new
 
         protected function fillForm(ThreatReport $threatReport): void
         {
-            $this->selected = $threatReport->load(['region', 'kingdom']);
+            $this->selected = $threatReport->load(['region', 'kingdom', 'monsters']);
             $this->reportNumber = $threatReport->report_number;
             $this->title = $threatReport->title;
             $this->type = $threatReport->type;
@@ -400,12 +417,14 @@ new
             $this->regionName = $threatReport->region?->name ?? '';
             $this->kingdomId = (string) ($threatReport->kingdom_id ?? '');
             $this->kingdomName = $threatReport->kingdom?->name ?? '';
+            $this->monsterIds = $threatReport->monsters->pluck('id')->map(fn ($id) => (int) $id)->all();
+            $this->monsterFormSearch = '';
         }
 
         protected function resetForm(): void
         {
             $this->selected = null;
-            $this->reset(['reportNumber', 'title', 'description']);
+            $this->reset(['reportNumber', 'title', 'description', 'monsterIds', 'monsterFormSearch']);
             $this->type = $this->types[0];
             $this->level = $this->levels[0];
             $this->status = $this->statuses[0];
@@ -413,6 +432,38 @@ new
             $this->clearRelation('region-form');
             $this->clearRelation('kingdom-form');
             $this->resetErrorBag();
+        }
+
+        #[Computed]
+        public function monsterFormResults()
+        {
+            return Monster::query()
+                ->when($this->monsterFormSearch !== '', fn (Builder $q) => $q->where('name', 'like', "%{$this->monsterFormSearch}%"))
+                ->whereNotIn('id', $this->monsterIds)
+                ->orderBy('name')
+                ->limit(8)
+                ->get(['id', 'name']);
+        }
+
+        #[Computed]
+        public function selectedMonsters()
+        {
+            return Monster::whereIn('id', $this->monsterIds)->orderBy('name')->get(['id', 'name']);
+        }
+
+        public function addMonster(string|int $monsterId): void
+        {
+            $monsterId = (int) $monsterId;
+
+            if (! in_array($monsterId, $this->monsterIds, true)) {
+                $this->monsterIds[] = $monsterId;
+            }
+            $this->monsterFormSearch = '';
+        }
+
+        public function removeMonster(string|int $monsterId): void
+        {
+            $this->monsterIds = array_values(array_diff($this->monsterIds, [(int) $monsterId]));
         }
 
     };

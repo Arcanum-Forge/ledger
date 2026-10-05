@@ -34,5 +34,8 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'ledger_api' => [
+        'key_hashes' => array_filter(explode(',', env('LEDGER_API_KEY_HASHES', ''))),
+]   ,
 
 ];
