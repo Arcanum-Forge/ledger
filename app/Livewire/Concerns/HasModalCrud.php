@@ -5,6 +5,7 @@ namespace App\Livewire\Concerns;
 trait HasModalCrud
 {
     public bool $showModal = false;
+
     public string $modalMode = 'create'; // create | edit | view | delete
 
     public function openCreate(): void

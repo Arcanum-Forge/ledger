@@ -2,8 +2,8 @@
 
 use Livewire\Component;
 
-new class extends Component {
-
+new class extends Component
+{
     // label + [background, accent, text] preview colors (hardcoded, since
     // CSS variables only reflect the active theme)
     public const THEMES = [
@@ -29,6 +29,7 @@ new class extends Component {
         $this->theme = $theme;
         Cookie::queue('theme', $theme, 60 * 24 * 365);
     }
+
     public function render()
     {
         return $this->view(['themes' => self::THEMES]);

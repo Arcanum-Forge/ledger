@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Faction extends Model
 {
     use HasFactory, HasUniqueSlug;
+
     protected function casts(): array
     {
         return [

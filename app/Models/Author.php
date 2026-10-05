@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'slug',
     'name',
     'bio',
-    'notes'
+    'notes',
 ])]
 class Author extends Model
 {

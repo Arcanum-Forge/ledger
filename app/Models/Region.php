@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable([
     'name',
     'slug',
-    'description'
+    'description',
 ])]
 class Region extends Model
 {

@@ -26,4 +26,3 @@ Route::middleware('auth')->group(function () {
 Route::middleware('guest')->group(function () {
     Route::livewire('/login', 'pages::auth.login')->name('login');
 });
-

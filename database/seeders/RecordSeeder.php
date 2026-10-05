@@ -15,7 +15,7 @@ class RecordSeeder extends Seeder
         // FactionSeeder's leaderId. 'Unknown' authorship isn't a real
         // author — it's the absence of one — so it resolves to null
         // rather than creating an Author literally named "Unknown".
-        $authorId = fn(?string $name): ?int => $name === null || $name === 'Unknown'
+        $authorId = fn (?string $name): ?int => $name === null || $name === 'Unknown'
             ? null
             : Author::firstOrCreate(['slug' => Str::slug($name)], ['name' => $name])->id;
 

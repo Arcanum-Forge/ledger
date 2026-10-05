@@ -13,158 +13,161 @@ use Livewire\WithPagination;
 
 new
     #[Title('Ledger — Users')]
-    class extends Component {
-
-    use WithPagination;
-    use HasCursorPagination;
-    use HasModalCrud;
-
-    public ?User $selected = null;
-
-    // Form fields
-    public string $name = '';
-    public string $email = '';
-    public string $password = '';
-    public string $password_confirmation = '';
-    public bool $verified = false;
-
-    #[Url(history: true)]
-    public string $search = '';
-
-    #[Url(history: true)]
-    public string $verifiedFilter = ''; // '' = any, '1' = verified, '0' = unverified
-
-    #[Url(history: true)]
-    public string $sortBy = 'name';
-
-    #[Url(history: true)]
-    public string $sortDirection = 'asc';
-
-    public function clearFilters(): void
+    class extends Component
     {
-        $this->reset(['search', 'verifiedFilter']);
-        $this->cursor = null;
-    }
+        use HasCursorPagination;
+        use HasModalCrud;
+        use WithPagination;
 
-    /**
-     * Shared filtered query — used both for the paginated list and the
-     * summary aggregates, so the summary always reflects what's filtered,
-     * not the whole table.
-     */
-    protected function filteredQuery(): Builder
-    {
-        return User::query()
-            ->when($this->search, fn(Builder $q) => $q->where(function (Builder $q) {
-                $q->where('name', 'like', "%{$this->search}%")
-                    ->orWhere('email', 'like', "%{$this->search}%");
-            }))
-            ->when($this->verifiedFilter !== '', fn(Builder $q) => $this->verifiedFilter === '1'
-                ? $q->whereNotNull('email_verified_at')
-                : $q->whereNull('email_verified_at'));
-    }
+        public ?User $selected = null;
 
-    protected function rules(): array
-    {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->selected?->id)],
-            'password' => [$this->selected ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
-        ];
-    }
+        // Form fields
+        public string $name = '';
 
-    public function openView(User $user): void
-    {
-        $this->fillForm($user);
-        $this->modalMode = 'view';
-        $this->showModal = true;
-    }
+        public string $email = '';
 
-    public function openEdit(User $user): void
-    {
-        $this->fillForm($user);
-        $this->modalMode = 'edit';
-        $this->showModal = true;
-    }
+        public string $password = '';
 
-    public function openDelete(User $user): void
-    {
-        $this->selected = $user;
-        $this->modalMode = 'delete';
-        $this->showModal = true;
-    }
+        public string $password_confirmation = '';
 
-    public function confirmDelete(): void
-    {
-        $this->selected?->delete();
-        session()->flash('success', 'User record removed from the archive.');
-        $this->closeModal();
-    }
+        public bool $verified = false;
 
-    public function save(): void
-    {
-        $data = $this->validate();
+        #[Url(history: true)]
+        public string $search = '';
 
-        if (empty($data['password'])) {
-            // Blank on edit means "leave it unchanged" — don't touch the
-            // existing hash. The cast on User handles hashing whenever a
-            // password value is actually present.
-            unset($data['password']);
+        #[Url(history: true)]
+        public string $verifiedFilter = ''; // '' = any, '1' = verified, '0' = unverified
+
+        #[Url(history: true)]
+        public string $sortBy = 'name';
+
+        #[Url(history: true)]
+        public string $sortDirection = 'asc';
+
+        public function clearFilters(): void
+        {
+            $this->reset(['search', 'verifiedFilter']);
+            $this->cursor = null;
         }
 
-        $data['email_verified_at'] = $this->verified ? now() : null;
-
-        if ($this->selected) {
-            $this->selected->update($data);
-            session()->flash('success', 'User record updated.');
-        } else {
-            User::create($data);
-            session()->flash('success', 'User record added to the archive.');
+        /**
+         * Shared filtered query — used both for the paginated list and the
+         * summary aggregates, so the summary always reflects what's filtered,
+         * not the whole table.
+         */
+        protected function filteredQuery(): Builder
+        {
+            return User::query()
+                ->when($this->search, fn (Builder $q) => $q->where(function (Builder $q) {
+                    $q->where('name', 'like', "%{$this->search}%")
+                        ->orWhere('email', 'like', "%{$this->search}%");
+                }))
+                ->when($this->verifiedFilter !== '', fn (Builder $q) => $this->verifiedFilter === '1'
+                    ? $q->whereNotNull('email_verified_at')
+                    : $q->whereNull('email_verified_at'));
         }
 
-        $this->closeModal();
-    }
+        protected function rules(): array
+        {
+            return [
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->selected?->id)],
+                'password' => [$this->selected ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
+            ];
+        }
 
-    protected function fillForm(User $user): void
-    {
-        $this->selected = $user;
-        $this->name = $user->name;
-        $this->email = $user->email;
-        $this->password = '';
-        $this->password_confirmation = '';
-        $this->verified = !is_null($user->email_verified_at);
-    }
+        public function openView(User $user): void
+        {
+            $this->fillForm($user);
+            $this->modalMode = 'view';
+            $this->showModal = true;
+        }
 
-    protected function resetForm(): void
-    {
-        $this->selected = null;
-        $this->reset(['name', 'email', 'password', 'password_confirmation']);
-        $this->verified = false;
-        $this->resetErrorBag();
-    }
+        public function openEdit(User $user): void
+        {
+            $this->fillForm($user);
+            $this->modalMode = 'edit';
+            $this->showModal = true;
+        }
 
-    public function render()
-    {
-        $filtered = $this->filteredQuery();
+        public function openDelete(User $user): void
+        {
+            $this->selected = $user;
+            $this->modalMode = 'delete';
+            $this->showModal = true;
+        }
 
-        $summary = [
-            'total' => (clone $filtered)->count(),
-            'verifiedCount' => (clone $filtered)->whereNotNull('email_verified_at')->count(),
-            'newest' => (clone $filtered)->orderByDesc('created_at')->orderByDesc('id')->first(),
-        ];
+        public function confirmDelete(): void
+        {
+            $this->selected?->delete();
+            session()->flash('success', 'User record removed from the archive.');
+            $this->closeModal();
+        }
 
-        $users = $filtered
-            ->orderBy($this->sortBy, $this->sortDirection)
-            ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
-            ->cursorPaginate(
-                perPage: 10,
-                cursorName: 'cursor',
-                cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
-            );
+        public function save(): void
+        {
+            $data = $this->validate();
 
-        return $this->view([
-            'users' => $users,
-            'summary' => $summary,
-        ]);
-    }
+            if (empty($data['password'])) {
+                // Blank on edit means "leave it unchanged" — don't touch the
+                // existing hash. The cast on User handles hashing whenever a
+                // password value is actually present.
+                unset($data['password']);
+            }
 
-};
+            $data['email_verified_at'] = $this->verified ? now() : null;
+
+            if ($this->selected) {
+                $this->selected->update($data);
+                session()->flash('success', 'User record updated.');
+            } else {
+                User::create($data);
+                session()->flash('success', 'User record added to the archive.');
+            }
+
+            $this->closeModal();
+        }
+
+        protected function fillForm(User $user): void
+        {
+            $this->selected = $user;
+            $this->name = $user->name;
+            $this->email = $user->email;
+            $this->password = '';
+            $this->password_confirmation = '';
+            $this->verified = ! is_null($user->email_verified_at);
+        }
+
+        protected function resetForm(): void
+        {
+            $this->selected = null;
+            $this->reset(['name', 'email', 'password', 'password_confirmation']);
+            $this->verified = false;
+            $this->resetErrorBag();
+        }
+
+        public function render()
+        {
+            $filtered = $this->filteredQuery();
+
+            $summary = [
+                'total' => (clone $filtered)->count(),
+                'verifiedCount' => (clone $filtered)->whereNotNull('email_verified_at')->count(),
+                'newest' => (clone $filtered)->orderByDesc('created_at')->orderByDesc('id')->first(),
+            ];
+
+            $users = $filtered
+                ->orderBy($this->sortBy, $this->sortDirection)
+                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
+                ->cursorPaginate(
+                    perPage: 10,
+                    cursorName: 'cursor',
+                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
+                );
+
+            return $this->view([
+                'users' => $users,
+                'summary' => $summary,
+            ]);
+        }
+    };

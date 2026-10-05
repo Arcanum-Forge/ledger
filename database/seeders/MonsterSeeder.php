@@ -15,7 +15,7 @@ class MonsterSeeder extends Seeder
         // that don't match an actual Kingdom — like the Veil Stalker's
         // "Unconfirmed" — resolve to null on their own, which is exactly
         // the right value for a sighting with no confirmed origin.
-        $kingdomId = fn(string $name): ?int => Kingdom::where('name', $name)->value('id');
+        $kingdomId = fn (string $name): ?int => Kingdom::where('name', $name)->value('id');
 
         $monsters = [
             [

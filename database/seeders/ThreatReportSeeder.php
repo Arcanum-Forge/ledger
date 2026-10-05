@@ -14,13 +14,13 @@ class ThreatReportSeeder extends Seeder
     {
         // Kingdoms are already fully seeded (KingdomSeeder), so this is a
         // plain lookup — never a create.
-        $kingdomId = fn(string $name): ?int => Kingdom::where('name', $name)->value('id');
+        $kingdomId = fn (string $name): ?int => Kingdom::where('name', $name)->value('id');
 
         // These regions ("Northern Drakmor", "Ravenwatch Tower", etc.) are
         // finer-grained locations than the four broad regions RegionSeeder
         // creates, so they're new Region rows in their own right — created
         // here the first time a report mentions them.
-        $regionId = fn(string $name): int => Region::firstOrCreate(
+        $regionId = fn (string $name): int => Region::firstOrCreate(
             ['slug' => Str::slug($name)],
             ['name' => $name],
         )->id;

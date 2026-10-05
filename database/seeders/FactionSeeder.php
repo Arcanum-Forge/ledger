@@ -16,12 +16,12 @@ class FactionSeeder extends Seeder
         // headquarters by name below, instead of hardcoding ids that would
         // shift depending on seeding order. Returns null for anything not
         // found (or intentionally unknown, like The Veiled Hand's).
-        $kingdomId = fn(string $name): ?int => Kingdom::where('name', $name)->value('id');
+        $kingdomId = fn (string $name): ?int => Kingdom::where('name', $name)->value('id');
 
         // Same idea for leaders, except here we also create the Leader
         // record if it doesn't exist yet — leaders don't have their own
         // seeder elsewhere, so this is their point of origin.
-        $leaderId = fn(string $name): int => Leader::firstOrCreate(
+        $leaderId = fn (string $name): int => Leader::firstOrCreate(
             ['slug' => Str::slug($name)],
             ['name' => $name],
         )->id;

@@ -77,7 +77,7 @@ trait HasSearchableRelations
         $term = $this->{$config['searchProperty']};
 
         return $config['model']::query()
-            ->when($term, fn(Builder $q) => $q->where($config['searchColumn'], 'like', "%{$term}%"))
+            ->when($term, fn (Builder $q) => $q->where($config['searchColumn'], 'like', "%{$term}%"))
             ->orderBy($config['searchColumn'])
             ->limit(8)
             ->get();

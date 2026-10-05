@@ -5,10 +5,10 @@ namespace App\Models;
 use App\Models\Concerns\HasUniqueSlug;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\RouteKey;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 #[RouteKey('slug')]
 #[Fillable([
@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
     'threat',
     'founded',
     'region_id',
-    'ruler_id'
+    'ruler_id',
 ])]
 class Kingdom extends Model
 {
@@ -31,7 +31,7 @@ class Kingdom extends Model
     protected function casts(): array
     {
         return [
-            'threat' => 'integer'
+            'threat' => 'integer',
         ];
     }
 
@@ -48,12 +48,11 @@ class Kingdom extends Model
     protected function threatColor(): Attribute
     {
         return Attribute::make(
-            get: fn() => match (true) {
+            get: fn () => match (true) {
                 $this->threat >= 70 => 'text-threat-critical',
                 $this->threat >= 40 => 'text-threat-high',
                 default => 'text-threat-low',
             },
         );
     }
-
 }
