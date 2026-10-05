@@ -1,9 +1,10 @@
+{{-- page-header.blade.php --}}
 @props(['eyebrow', 'title'])
 
 <div class="mb-8 flex items-center justify-between">
     <div>
-        <p class="text-[9px] uppercase tracking-[0.3em] text-[#806337]">{{ $eyebrow }}</p>
-        <h1 class="mt-1 font-serif text-3xl text-[#e8dfca]">{{ $title }}</h1>
+        <p class="text-[10px] uppercase tracking-[0.3em] text-gold-dim">{{ $eyebrow }}</p>
+        <h1 class="mt-1 font-serif text-3xl text-parchment-bright">{{ $title }}</h1>
     </div>
 
     @isset($actions)

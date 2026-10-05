@@ -49,9 +49,9 @@ class Kingdom extends Model
     {
         return Attribute::make(
             get: fn() => match (true) {
-                $this->threat >= 70 => 'text-[#c14545]',
-                $this->threat >= 40 => 'text-[#b98967]',
-                default => 'text-[#7a9b6e]',
+                $this->threat >= 70 => 'text-threat-critical',
+                $this->threat >= 40 => 'text-threat-high',
+                default => 'text-threat-low',
             },
         );
     }

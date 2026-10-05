@@ -36,10 +36,10 @@
             @forelse ($this->activeThreats as $report)
                 <div class="flex items-center justify-between gap-4 px-5 py-4">
                     <div class="min-w-0">
-                        <p class="truncate font-serif text-sm text-[#ddd2bb]">
+                        <p class="truncate font-serif text-sm text-parchment">
                             {{ $report->title }}
                         </p>
-                        <p class="mt-0.5 text-[10px] text-[#625744]">
+                        <p class="mt-0.5 text-[10px] text-faint">
                             {{ $report->report_number }}
                             · {{ $report->region->name ?? '—' }}
                             @if ($report->kingdom)
@@ -52,7 +52,7 @@
                     </span>
                 </div>
             @empty
-                <p class="px-5 py-8 text-center text-xs text-[#625744]">
+                <p class="px-5 py-8 text-center text-xs text-faint">
                     No active or investigating reports.
                 </p>
             @endforelse
@@ -72,11 +72,11 @@
             @forelse ($this->dangerousMonsters as $monster)
                 <div class="flex items-center justify-between gap-4 px-5 py-4">
                     <div class="min-w-0">
-                        <p class="truncate font-serif text-sm text-[#ddd2bb]">
+                        <p class="truncate font-serif text-sm text-parchment">
                             {{ $monster->name }}
                         </p>
 
-                        <p class="mt-0.5 text-[10px] text-[#625744]">
+                        <p class="mt-0.5 text-[10px] text-faint">
                             {{ $monster->classification }}
                             · {{ $monster->kingdom->name ?? 'Unconfirmed' }}
                         </p>
@@ -86,7 +86,7 @@
                     </span>
                 </div>
             @empty
-                <p class="px-5 py-8 text-center text-xs text-[#625744]">
+                <p class="px-5 py-8 text-center text-xs text-faint">
                     No sightings recorded.
                 </p>
             @endforelse
@@ -107,17 +107,17 @@
             @forelse ($this->recentRecords as $record)
                 <div class="flex items-center justify-between gap-4 px-5 py-4">
                     <div class="min-w-0">
-                        <p class="truncate font-serif text-sm text-[#ddd2bb]">{{ $record->title }}</p>
-                        <p class="mt-0.5 text-[10px] text-[#625744]">
+                        <p class="truncate font-serif text-sm text-parchment">{{ $record->title }}</p>
+                        <p class="mt-0.5 text-[10px] text-faint">
                             {{ $record->category }} · {{ $record->author->name ?? 'Unknown' }}
                         </p>
                     </div>
                     @if ($record->confidential)
-                        <span class="shrink-0 text-[9px] uppercase tracking-[0.15em] text-[#c14545]">Confidential</span>
+                        <span class="shrink-0 text-[9px] uppercase tracking-[0.15em] text-danger">Confidential</span>
                     @endif
                 </div>
             @empty
-                <p class="px-5 py-8 text-center text-xs text-[#625744]">No records archived.</p>
+                <p class="px-5 py-8 text-center text-xs text-faint">No records archived.</p>
             @endforelse
         </x-dashboard.panel>
         @endisland
@@ -136,16 +136,16 @@
             @forelse ($this->risingFactions as $faction)
                 <div class="flex items-center justify-between gap-4 px-5 py-4">
                     <div class="min-w-0">
-                        <p class="truncate font-serif text-sm text-[#ddd2bb]">{{ $faction->name }}</p>
-                        <p class="mt-0.5 text-[10px] text-[#625744]">
+                        <p class="truncate font-serif text-sm text-parchment">{{ $faction->name }}</p>
+                        <p class="mt-0.5 text-[10px] text-faint">
                             {{ $faction->kingdom->name ?? 'Unknown' }} · Led by
                             {{ $faction->leader->name ?? 'Unknown' }}
                         </p>
                     </div>
-                    <span class="shrink-0 font-serif text-sm font-semibold text-[#d8c8a8]">{{ $faction->influence }}</span>
+                    <span class="shrink-0 font-serif text-sm font-semibold text-parchment">{{ $faction->influence }}</span>
                 </div>
             @empty
-                <p class="px-5 py-8 text-center text-xs text-[#625744]">No factions recorded.</p>
+                <p class="px-5 py-8 text-center text-xs text-faint">No factions recorded.</p>
             @endforelse
         </x-dashboard.panel>
         @endisland

@@ -10,16 +10,16 @@
 
     <x-summary-cards>
         <x-summary-card label="Reports Shown">
-            <p class="font-serif text-3xl text-[#d8c8a8]">{{ $summary['total'] }}</p>
+            <p class="font-serif text-3xl text-parchment">{{ $summary['total'] }}</p>
         </x-summary-card>
         <x-summary-card label="Average Sightings">
-            <p class="font-serif text-3xl text-[#d8c8a8]">{{ $summary['avgSightings'] }}</p>
+            <p class="font-serif text-3xl text-parchment">{{ $summary['avgSightings'] }}</p>
         </x-summary-card>
         <x-summary-card label="Most Severe" :last="true">
-            <p class="font-serif text-lg text-[#b98967]">
+            <p class="font-serif text-lg text-gold">
                 {{ $summary['mostSevere']?->title ?? '—' }}
                 @if ($summary['mostSevere'])
-                    <span class="text-sm text-[#756d5e]">({{ $summary['mostSevere']->level }})</span>
+                    <span class="text-sm text-faint">({{ $summary['mostSevere']->level }})</span>
                 @endif
             </p>
         </x-summary-card>
@@ -51,12 +51,12 @@
     </x-filter-panel>
 
     {{-- Table --}}
-    <div class="border border-[#2c2922] bg-[#151310]">
+    <div class="border border-line bg-card">
         {{-- Desktop / Tablet --}}
         <div class="hidden overflow-x-auto md:block">
             <table class="w-full min-w-[950px] text-left">
                 <thead>
-                    <tr class="border-b border-[#2c2922] text-[8px] uppercase tracking-[0.2em] text-[#625744]">
+                    <tr class="border-b border-line text-[8px] uppercase tracking-[0.2em] text-faint">
                         @foreach (['report_number' => 'Report #', 'title' => 'Title', 'type' => 'Type', 'level' => 'Level', 'status' => 'Status', 'sightings' => 'Sightings'] as $col => $label)
                             <x-sortable-th :column="$col" :label="$label" :sort-by="$sortBy"
                                 :sort-direction="$sortDirection" />
@@ -68,30 +68,30 @@
                     </tr>
                 </thead>
 
-                <tbody class="divide-y divide-[#2c2922]/60">
+                <tbody class="divide-y divide-line/60">
                     @forelse ($reports as $report)
-                                    <tr class="transition hover:bg-[#191611]">
-                                        <td class="px-5 py-4 text-xs text-[#625744]">{{ $report->report_number }}</td>
+                                    <tr class="transition hover:bg-card-hover">
+                                        <td class="px-5 py-4 text-xs text-faint">{{ $report->report_number }}</td>
 
                                         <td class="px-5 py-4">
                                             <button wire:click="openView('{{ $report->slug }}')" class="text-left">
-                                                <div class="font-serif text-sm text-[#ddd2bb]">{{ $report->title }}</div>
+                                                <div class="font-serif text-sm text-parchment">{{ $report->title }}</div>
                                             </button>
                                         </td>
 
-                                        <td class="px-5 py-4 text-xs text-[#8f826b]">{{ $report->type }}</td>
+                                        <td class="px-5 py-4 text-xs text-muted">{{ $report->type }}</td>
 
                                         <td class="px-5 py-4 text-[9px] uppercase tracking-[0.15em]">
                                             <x-severity-text :value="$report->level" :colors="[
-                            'Critical' => 'text-[#c14545]',
-                            'Severe' => 'text-[#b98967]',
-                        ]" default="text-[#c59b4a]" />
+                            'Critical' => 'text-danger',
+                            'Severe' => 'text-gold',
+                        ]" default="text-gold" />
                                         </td>
 
-                                        <td class="px-5 py-4 text-xs text-[#8f826b]">{{ $report->status }}</td>
-                                        <td class="px-5 py-4 text-sm font-semibold text-[#d8c8a8]">{{ $report->sightings }}</td>
-                                        <td class="px-5 py-4 text-xs text-[#8f826b]">{{ $report->region->name ?? '—' }}</td>
-                                        <td class="px-5 py-4 text-xs text-[#8f826b]">{{ $report->kingdom->name ?? 'Unconfirmed' }}</td>
+                                        <td class="px-5 py-4 text-xs text-muted">{{ $report->status }}</td>
+                                        <td class="px-5 py-4 text-sm font-semibold text-parchment">{{ $report->sightings }}</td>
+                                        <td class="px-5 py-4 text-xs text-muted">{{ $report->region->name ?? '—' }}</td>
+                                        <td class="px-5 py-4 text-xs text-muted">{{ $report->kingdom->name ?? 'Unconfirmed' }}</td>
 
                                         <td class="px-5 py-4">
                                             <x-row-actions :id="$report->slug" />
@@ -111,46 +111,47 @@
         </div>
 
         {{-- Mobile --}}
-        <div class="divide-y divide-[#2c2922]/60 md:hidden">
+        <div class="divide-y divide-line/60 md:hidden">
             @forelse ($reports as $report)
                     <div class="p-5">
                         <div class="flex items-start justify-between gap-4">
                             <button wire:click="openView('{{ $report->slug }}')" class="min-w-0 text-left">
-                                <div class="font-serif text-base text-[#ddd2bb]">{{ $report->title }}</div>
-                                <div class="mt-1 text-[9px] uppercase tracking-[0.15em] text-[#625744]">
-                                    {{ $report->report_number }}</div>
+                                <div class="font-serif text-base text-parchment">{{ $report->title }}</div>
+                                <div class="mt-1 text-[9px] uppercase tracking-[0.15em] text-faint">
+                                    {{ $report->report_number }}
+                                </div>
                             </button>
                             <div class="shrink-0 text-right">
-                                <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Level</div>
+                                <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Level</div>
                                 <div class="mt-1 text-sm font-semibold">
                                     <x-severity-text :value="$report->level" :colors="[
-                    'Critical' => 'text-[#c14545]',
-                    'Severe' => 'text-[#b98967]',
-                ]" default="text-[#c59b4a]" />
+                    'Critical' => 'text-danger',
+                    'Severe' => 'text-gold',
+                ]" default="text-gold" />
                                 </div>
                             </div>
                         </div>
 
                         <div class="mt-5 grid grid-cols-2 gap-x-6 gap-y-4">
                             <div>
-                                <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Region</div>
-                                <div class="mt-1 text-xs text-[#8f826b]">{{ $report->region->name ?? '—' }}</div>
+                                <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Region</div>
+                                <div class="mt-1 text-xs text-muted">{{ $report->region->name ?? '—' }}</div>
                             </div>
                             <div>
-                                <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Kingdom</div>
-                                <div class="mt-1 text-xs text-[#8f826b]">{{ $report->kingdom->name ?? 'Unconfirmed' }}</div>
+                                <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Kingdom</div>
+                                <div class="mt-1 text-xs text-muted">{{ $report->kingdom->name ?? 'Unconfirmed' }}</div>
                             </div>
                             <div>
-                                <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Status</div>
-                                <div class="mt-1 text-xs text-[#8f826b]">{{ $report->status }}</div>
+                                <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Status</div>
+                                <div class="mt-1 text-xs text-muted">{{ $report->status }}</div>
                             </div>
                             <div>
-                                <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Sightings</div>
-                                <div class="mt-1 text-xs text-[#8f826b]">{{ $report->sightings }}</div>
+                                <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Sightings</div>
+                                <div class="mt-1 text-xs text-muted">{{ $report->sightings }}</div>
                             </div>
                         </div>
 
-                        <div class="mt-5 flex items-center justify-end gap-5 border-t border-[#2c2922]/60 pt-4">
+                        <div class="mt-5 flex items-center justify-end gap-5 border-t border-line/60 pt-4">
                             <x-row-actions :id="$report->slug" />
                         </div>
                     </div>
@@ -169,25 +170,25 @@
         @if ($showModal)
             @if ($modalMode === 'view' && $selected)
                 <div class="mb-6 flex items-center gap-3">
-                    <span class="h-px w-8 bg-[#806337]"></span>
-                    <span class="text-[9px] uppercase tracking-[0.28em] text-[#a17e43]">{{ $selected->report_number }}</span>
+                    <span class="h-px w-8 bg-line"></span>
+                    <span class="text-[9px] uppercase tracking-[0.28em] text-gold-dim">{{ $selected->report_number }}</span>
                 </div>
 
-                <h2 class="font-serif text-3xl text-[#e8dfca]">{{ $selected->title }}</h2>
-                <p class="mt-1 text-xs uppercase tracking-[0.2em] text-[#806337]">{{ $selected->type }}</p>
+                <h2 class="font-serif text-3xl text-parchment-bright">{{ $selected->title }}</h2>
+                <p class="mt-1 text-xs uppercase tracking-[0.2em] text-line">{{ $selected->type }}</p>
 
-                <p class="mt-5 text-sm leading-7 text-[#8f826b]">{{ $selected->description ?? 'No further details on file.' }}
+                <p class="mt-5 text-sm leading-7 text-muted">{{ $selected->description ?? 'No further details on file.' }}
                 </p>
 
-                <div class="mt-7 grid grid-cols-2 gap-5 border-t border-[#2c2922] pt-6 text-xs">
+                <div class="mt-7 grid grid-cols-2 gap-5 border-t border-line pt-6 text-xs">
                     <x-detail-item label="Region">{{ $selected->region->name ?? '—' }}</x-detail-item>
                     <x-detail-item label="Kingdom">{{ $selected->kingdom->name ?? 'Unconfirmed' }}</x-detail-item>
                     <div>
-                        <p class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Level</p>
+                        <p class="text-[8px] uppercase tracking-[0.15em] text-faint">Level</p>
                         <p class="mt-1 font-semibold">
-                            <x-severity-text :value="$selected->level" default="text-[#cdbd9e]" :colors="[
-                        'Critical' => 'text-[#c14545]',
-                        'Severe' => 'text-[#b98967]',
+                            <x-severity-text :value="$selected->level" default="text-parchment-dim" :colors="[
+                        'Critical' => 'text-danger',
+                        'Severe' => 'text-gold',
                     ]" />
                         </p>
                     </div>
@@ -202,13 +203,13 @@
 
             @elseif ($modalMode === 'delete' && $selected)
                 <div class="mb-6 flex items-center gap-3">
-                    <span class="h-px w-8 bg-[#c14545]/60"></span>
-                    <span class="text-[9px] uppercase tracking-[0.28em] text-[#c14545]">Strike from the Log</span>
+                    <span class="h-px w-8 bg-danger/60"></span>
+                    <span class="text-[9px] uppercase tracking-[0.28em] text-danger">Strike from the Log</span>
                 </div>
 
-                <h2 class="font-serif text-2xl text-[#e8dfca]">Remove {{ $selected->title }}?</h2>
-                <p class="mt-3 text-sm leading-6 text-[#8f826b]">
-                    This permanently erases report <span class="text-[#cdbd9e]">{{ $selected->report_number }}</span> from the
+                <h2 class="font-serif text-2xl text-parchment-bright">Remove {{ $selected->title }}?</h2>
+                <p class="mt-3 text-sm leading-6 text-muted">
+                    This permanently erases report <span class="text-parchment-dim">{{ $selected->report_number }}</span> from the
                     log. This cannot be undone.
                 </p>
 
@@ -222,7 +223,7 @@
                 </div>
 
             @else
-                <h2 class="mb-6 font-serif text-2xl text-[#e8dfca]">
+                <h2 class="mb-6 font-serif text-2xl text-parchment-bright">
                     {{ $modalMode === 'edit' ? 'Amend Report' : 'File a New Report' }}
                 </h2>
 
@@ -242,7 +243,7 @@
                                 select-action="selectRegionForm" clear-action="clearRegionForm" clear-label="Unknown"
                                 option-label-key="label" />
                             @error('regionId')
-                            <p class="mt-1.5 text-[10px] text-[#c14545]">{{ $message }}</p> @enderror
+                            <p class="mt-1.5 text-[10px] text-danger">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
@@ -251,7 +252,7 @@
                                 select-action="selectKingdomForm" clear-action="clearKingdomForm" clear-label="Unconfirmed"
                                 option-label-key="label" />
                             @error('kingdomId')
-                            <p class="mt-1.5 text-[10px] text-[#c14545]">{{ $message }}</p> @enderror
+                            <p class="mt-1.5 text-[10px] text-danger">{{ $message }}</p> @enderror
                         </div>
                     </div>
 

@@ -10,16 +10,16 @@
 
     <x-summary-cards>
         <x-summary-card label="Records Shown">
-            <p class="font-serif text-3xl text-[#d8c8a8]">{{ $summary['total'] }}</p>
+            <p class="font-serif text-3xl text-parchment">{{ $summary['total'] }}</p>
         </x-summary-card>
         <x-summary-card label="Confidential">
-            <p class="font-serif text-3xl text-[#d8c8a8]">{{ $summary['confidentialCount'] }}</p>
+            <p class="font-serif text-3xl text-parchment">{{ $summary['confidentialCount'] }}</p>
         </x-summary-card>
         <x-summary-card label="Most Significant" :last="true">
-            <p class="font-serif text-lg text-[#b98967]">
+            <p class="font-serif text-lg text-gold">
                 {{ $summary['mostSignificant']?->title ?? '—' }}
                 @if ($summary['mostSignificant'])
-                    <span class="text-sm text-[#756d5e]">({{ $summary['mostSignificant']->importance }})</span>
+                    <span class="text-sm text-faint">({{ $summary['mostSignificant']->importance }})</span>
                 @endif
             </p>
         </x-summary-card>
@@ -41,9 +41,9 @@
             {{-- Kept as plain markup: value/label don't match (0=Public, 1=Confidential), unlike every other select
             filter --}}
             <div>
-                <label class="mb-1.5 block text-[9px] uppercase tracking-[0.2em] text-[#806337]">Access</label>
+                <label class="mb-1.5 block text-[9px] uppercase tracking-[0.2em] text-line">Access</label>
                 <select wire:model.live="confidentialFilter"
-                    class="w-full border border-[#3b3225] bg-[#0d0c0a] px-3 py-2.5 text-xs text-[#e8dfca] outline-none focus:border-[#806337]">
+                    class="w-full border border-line bg-card-inset px-3 py-2.5 text-xs text-parchment-bright outline-none focus:border-line">
                     <option value="">Any</option>
                     <option value="0">Public</option>
                     <option value="1">Confidential</option>
@@ -57,12 +57,12 @@
     </x-filter-panel>
 
     {{-- Table --}}
-    <div class="border border-[#2c2922] bg-[#151310]">
+    <div class="border border-line bg-card">
         {{-- Desktop / Tablet --}}
         <div class="hidden overflow-x-auto md:block">
             <table class="w-full min-w-[900px] text-left">
                 <thead>
-                    <tr class="border-b border-[#2c2922] text-[8px] uppercase tracking-[0.2em] text-[#625744]">
+                    <tr class="border-b border-line text-[8px] uppercase tracking-[0.2em] text-faint">
                         @foreach (['title' => 'Title', 'category' => 'Category', 'era' => 'Era', 'importance' => 'Importance'] as $col => $label)
                             <x-sortable-th :column="$col" :label="$label" :sort-by="$sortBy"
                                 :sort-direction="$sortDirection" />
@@ -74,32 +74,32 @@
                     </tr>
                 </thead>
 
-                <tbody class="divide-y divide-[#2c2922]/60">
+                <tbody class="divide-y divide-line/60">
                     @forelse ($records as $record)
-                                    <tr class="transition hover:bg-[#191611]">
+                                    <tr class="transition hover:bg-card-hover">
                                         <td class="px-5 py-4">
                                             <button wire:click="openView('{{ $record->slug }}')" class="text-left">
-                                                <div class="font-serif text-sm text-[#ddd2bb]">{{ $record->title }}</div>
-                                                <div class="text-[9px] uppercase tracking-[0.15em] text-[#625744]">
+                                                <div class="font-serif text-sm text-parchment">{{ $record->title }}</div>
+                                                <div class="text-[9px] uppercase tracking-[0.15em] text-faint">
                                                     {{ $record->date ?: 'Undated' }}</div>
                                             </button>
                                         </td>
 
-                                        <td class="px-5 py-4 text-xs text-[#8f826b]">{{ $record->category }}</td>
-                                        <td class="px-5 py-4 text-xs text-[#8f826b]">{{ $record->era }}</td>
+                                        <td class="px-5 py-4 text-xs text-muted">{{ $record->category }}</td>
+                                        <td class="px-5 py-4 text-xs text-muted">{{ $record->era }}</td>
 
                                         <td class="px-5 py-4 text-[9px] uppercase tracking-[0.15em]">
                                             <x-severity-text :value="$record->importance" :colors="[
-                            'Critical' => 'text-[#c14545]',
-                            'Important' => 'text-[#b98967]',
+                            'Critical' => 'text-danger',
+                            'Important' => 'text-gold',
                         ]" />
                                         </td>
 
-                                        <td class="px-5 py-4 text-xs text-[#8f826b]">{{ $record->author->name ?? 'Unknown' }}</td>
+                                        <td class="px-5 py-4 text-xs text-muted">{{ $record->author->name ?? 'Unknown' }}</td>
 
                                         <td class="px-5 py-4 text-[9px] uppercase tracking-[0.15em]">
                                             <x-severity-text :value="$record->confidential ? 'Confidential' : 'Public'"
-                                                :colors="['Confidential' => 'text-[#c14545]']" default="text-[#625744]" />
+                                                :colors="['Confidential' => 'text-danger']" default="text-faint" />
                                         </td>
 
                                         <td class="px-5 py-4">
@@ -121,21 +121,21 @@
         </div>
 
         {{-- Mobile --}}
-        <div class="divide-y divide-[#2c2922]/60 md:hidden">
+        <div class="divide-y divide-line/60 md:hidden">
             @forelse ($records as $record)
                     <div class="p-5">
                         <div class="flex items-start justify-between gap-4">
                             <button wire:click="openView('{{ $record->slug }}')" class="min-w-0 text-left">
-                                <div class="font-serif text-base text-[#ddd2bb]">{{ $record->title }}</div>
-                                <div class="mt-1 text-[9px] uppercase tracking-[0.15em] text-[#625744]">
+                                <div class="font-serif text-base text-parchment">{{ $record->title }}</div>
+                                <div class="mt-1 text-[9px] uppercase tracking-[0.15em] text-faint">
                                     {{ $record->date ?: 'Undated' }}</div>
                             </button>
                             <div class="shrink-0 text-right">
-                                <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Importance</div>
+                                <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Importance</div>
                                 <div class="mt-1 text-sm font-semibold">
                                     <x-severity-text :value="$record->importance" :colors="[
-                    'Critical' => 'text-[#c14545]',
-                    'Important' => 'text-[#b98967]',
+                    'Critical' => 'text-danger',
+                    'Important' => 'text-gold',
                 ]" />
                                 </div>
                             </div>
@@ -143,27 +143,27 @@
 
                         <div class="mt-5 grid grid-cols-2 gap-x-6 gap-y-4">
                             <div>
-                                <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Category</div>
-                                <div class="mt-1 text-xs text-[#8f826b]">{{ $record->category }}</div>
+                                <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Category</div>
+                                <div class="mt-1 text-xs text-muted">{{ $record->category }}</div>
                             </div>
                             <div>
-                                <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Era</div>
-                                <div class="mt-1 text-xs text-[#8f826b]">{{ $record->era }}</div>
+                                <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Era</div>
+                                <div class="mt-1 text-xs text-muted">{{ $record->era }}</div>
                             </div>
                             <div>
-                                <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Author</div>
-                                <div class="mt-1 text-xs text-[#8f826b]">{{ $record->author->name ?? 'Unknown' }}</div>
+                                <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Author</div>
+                                <div class="mt-1 text-xs text-muted">{{ $record->author->name ?? 'Unknown' }}</div>
                             </div>
                             <div>
-                                <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Access</div>
+                                <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Access</div>
                                 <div class="mt-1 text-[9px] uppercase tracking-[0.15em]">
                                     <x-severity-text :value="$record->confidential ? 'Confidential' : 'Public'"
-                                        :colors="['Confidential' => 'text-[#c14545]']" default="text-[#625744]" />
+                                        :colors="['Confidential' => 'text-danger']" default="text-faint" />
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mt-5 flex items-center justify-end gap-5 border-t border-[#2c2922]/60 pt-4">
+                        <div class="mt-5 flex items-center justify-end gap-5 border-t border-line/60 pt-4">
                             <x-row-actions :id="$record->slug" />
                         </div>
                     </div>
@@ -182,28 +182,28 @@
         @if ($showModal)
             @if ($modalMode === 'view' && $selected)
                 <div class="mb-6 flex items-center gap-3">
-                    <span class="h-px w-8 bg-[#806337]"></span>
-                    <span class="text-[9px] uppercase tracking-[0.28em] text-[#a17e43]">{{ $selected->category }}</span>
+                    <span class="h-px w-8 bg-line"></span>
+                    <span class="text-[9px] uppercase tracking-[0.28em] text-gold-dim">{{ $selected->category }}</span>
                     @if ($selected->confidential)
-                        <span class="ml-auto text-[9px] uppercase tracking-[0.2em] text-[#c14545]">Confidential</span>
+                        <span class="ml-auto text-[9px] uppercase tracking-[0.2em] text-danger">Confidential</span>
                     @endif
                 </div>
 
-                <h2 class="font-serif text-3xl text-[#e8dfca]">{{ $selected->title }}</h2>
-                <p class="mt-1 text-xs uppercase tracking-[0.2em] text-[#806337]">{{ $selected->era }} ·
+                <h2 class="font-serif text-3xl text-parchment-bright">{{ $selected->title }}</h2>
+                <p class="mt-1 text-xs uppercase tracking-[0.2em] text-line">{{ $selected->era }} ·
                     {{ $selected->date ?: 'Undated' }}</p>
 
-                <p class="mt-5 whitespace-pre-line text-sm leading-7 text-[#8f826b]">
+                <p class="mt-5 whitespace-pre-line text-sm leading-7 text-muted">
                     {{ $selected->content ?: ($selected->excerpt ?? 'No content on file.') }}</p>
 
-                <div class="mt-7 grid grid-cols-2 gap-5 border-t border-[#2c2922] pt-6 text-xs">
+                <div class="mt-7 grid grid-cols-2 gap-5 border-t border-line pt-6 text-xs">
                     <x-detail-item label="Author">{{ $selected->author->name ?? 'Unknown' }}</x-detail-item>
                     <div>
-                        <p class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Importance</p>
+                        <p class="text-[8px] uppercase tracking-[0.15em] text-faint">Importance</p>
                         <p class="mt-1 font-semibold">
-                            <x-severity-text :value="$selected->importance" default="text-[#cdbd9e]" :colors="[
-                        'Critical' => 'text-[#c14545]',
-                        'Important' => 'text-[#b98967]',
+                            <x-severity-text :value="$selected->importance" default="text-parchment-dim" :colors="[
+                        'Critical' => 'text-danger',
+                        'Important' => 'text-gold',
                     ]" />
                         </p>
                     </div>
@@ -216,13 +216,13 @@
 
             @elseif ($modalMode === 'delete' && $selected)
                 <div class="mb-6 flex items-center gap-3">
-                    <span class="h-px w-8 bg-[#c14545]/60"></span>
-                    <span class="text-[9px] uppercase tracking-[0.28em] text-[#c14545]">Strike from the Archive</span>
+                    <span class="h-px w-8 bg-danger/60"></span>
+                    <span class="text-[9px] uppercase tracking-[0.28em] text-danger">Strike from the Archive</span>
                 </div>
 
-                <h2 class="font-serif text-2xl text-[#e8dfca]">Remove {{ $selected->title }}?</h2>
-                <p class="mt-3 text-sm leading-6 text-[#8f826b]">
-                    This permanently erases <span class="text-[#cdbd9e]">{{ $selected->title }}</span> from the archive. This
+                <h2 class="font-serif text-2xl text-parchment-bright">Remove {{ $selected->title }}?</h2>
+                <p class="mt-3 text-sm leading-6 text-muted">
+                    This permanently erases <span class="text-parchment-dim">{{ $selected->title }}</span> from the archive. This
                     cannot be undone.
                 </p>
 
@@ -236,7 +236,7 @@
                 </div>
 
             @else
-                <h2 class="mb-6 font-serif text-2xl text-[#e8dfca]">
+                <h2 class="mb-6 font-serif text-2xl text-parchment-bright">
                     {{ $modalMode === 'edit' ? 'Amend Record' : 'Add a New Record' }}
                 </h2>
 
@@ -259,7 +259,7 @@
                                 select-action="selectAuthorForm" clear-action="clearAuthorForm" clear-label="Unknown"
                                 option-label-key="label" />
                             @error('authorId')
-                            <p class="mt-1.5 text-[10px] text-[#c14545]">{{ $message }}</p> @enderror
+                            <p class="mt-1.5 text-[10px] text-danger">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
@@ -267,8 +267,8 @@
                         <x-select-input model="importance" label="Importance" :options="$importances" />
 
                         <div class="flex items-end pb-2.5">
-                            <label class="flex items-center gap-2 text-xs text-[#c8b895]">
-                                <input type="checkbox" wire:model="confidential" class="accent-[#806337]">
+                            <label class="flex items-center gap-2 text-xs text-parchment-dim">
+                                <input type="checkbox" wire:model="confidential" class="accent-line">
                                 Restricted / confidential
                             </label>
                         </div>

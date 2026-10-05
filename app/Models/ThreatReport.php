@@ -64,9 +64,9 @@ class ThreatReport extends Model
     {
         return Attribute::make(
             get: fn() => match ($this->level) {
-                'Critical' => 'text-[#c14545]',
-                'Severe' => 'text-[#b98967]',
-                default => 'text-[#c59b4a]',
+                'Critical' => 'text-threat-critical',
+                'Severe' => 'text-threat-high',
+                default => 'text-threat-mid',
             },
         );
     }

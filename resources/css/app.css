@@ -8,6 +8,142 @@
         "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
+
+    --color-ink: #191817;
+    --color-ink-raised: #201f1c;
+    --color-surface: #2a2824;
+    --color-surface-hover: #322f2a;
+    --color-line: #3b3832;
+    --color-line-warm: #403b34;
+    --color-bronze: #887962;
+    --color-bronze-light: #a3947b;
+    --color-gold: #b7a477;
+    --color-gold-soft: #c9b991;
+    --color-gold-dim: #968763;
+    --color-parchment: #ded8c9;
+    --color-parchment-bright: #ebe6da;
+    --color-muted: #999181;
+    --color-faint: #7f796d;
+    --color-card: #211f1c;
+    --color-card-hover: #282521;
+    --color-card-inset: #1d1b19;
+    --color-line-bronze: #4a4439;
+    --color-mark-border: #615949;
+    --color-numeral-hover: #514b40;
+    --color-parchment-dim: #cbc4b4;
+    --color-danger: #b18478;
+    --color-threat-critical: #cc5546;
+    --color-threat-high: #c4845a;
+    --color-threat-mid: #bfa24f;
+    --color-threat-low: #7f9a74;
+}
+
+/* Verdant: elven forest, moss and sage */
+[data-theme="verdant"] {
+    --color-ink: #121814;
+    --color-ink-raised: #181f1a;
+    --color-surface: #212a23;
+    --color-surface-hover: #29342b;
+    --color-line: #313e33;
+    --color-line-warm: #364437;
+    --color-bronze: #6f8a73;
+    --color-bronze-light: #8aa58d;
+    --color-gold: #a3bb86;
+    --color-gold-soft: #bcd2a2;
+    --color-gold-dim: #7f9667;
+    --color-parchment: #d6dccb;
+    --color-parchment-bright: #e7ecdd;
+    --color-muted: #8c9885;
+    --color-faint: #747f6d;
+    --color-card: #1a211c;
+    --color-card-hover: #212922;
+    --color-card-inset: #151b17;
+    --color-line-bronze: #3a4a3d;
+    --color-mark-border: #526554;
+    --color-numeral-hover: #3f4d41;
+    --color-parchment-dim: #bcc5b0;
+}
+
+/* Crimson: war council, wine and rose-gold */
+[data-theme="crimson"] {
+    --color-ink: #1a1213;
+    --color-ink-raised: #221718;
+    --color-surface: #2e2021;
+    --color-surface-hover: #382627;
+    --color-line: #44302f;
+    --color-line-warm: #4b3433;
+    --color-bronze: #9a6d66;
+    --color-bronze-light: #b4857d;
+    --color-gold: #c9998a;
+    --color-gold-soft: #dbb3a5;
+    --color-gold-dim: #a37868;
+    --color-parchment: #e0d3cc;
+    --color-parchment-bright: #efe5df;
+    --color-muted: #a08f89;
+    --color-faint: #857570;
+    --color-card: #231819;
+    --color-card-hover: #2b1f20;
+    --color-card-inset: #1d1415;
+    --color-line-bronze: #523b39;
+    --color-mark-border: #6e4f4a;
+    --color-numeral-hover: #5a403d;
+    --color-parchment-dim: #c9b9b1;
+}
+
+/* Frost: northern keep, steel and ice */
+[data-theme="frost"] {
+    --color-ink: #12161a;
+    --color-ink-raised: #181d22;
+    --color-surface: #212830;
+    --color-surface-hover: #29323b;
+    --color-line: #313b46;
+    --color-line-warm: #36424e;
+    --color-bronze: #6f8396;
+    --color-bronze-light: #8a9fb2;
+    --color-gold: #9fb8cf;
+    --color-gold-soft: #bcd0e2;
+    --color-gold-dim: #7a93aa;
+    --color-parchment: #d3dbe3;
+    --color-parchment-bright: #e6ecf2;
+    --color-muted: #8795a3;
+    --color-faint: #6f7d8a;
+    --color-card: #191e24;
+    --color-card-hover: #20262d;
+    --color-card-inset: #14181d;
+    --color-line-bronze: #3a4756;
+    --color-mark-border: #52647a;
+    --color-numeral-hover: #3f4d5c;
+    --color-parchment-dim: #b9c4cf;
+}
+
+/* Amethyst: arcane order, dusk violet and lilac */
+[data-theme="amethyst"] {
+    --color-ink: #16131a;
+    --color-ink-raised: #1c1822;
+    --color-surface: #27212e;
+    --color-surface-hover: #302937;
+    --color-line: #3a3144;
+    --color-line-warm: #40364b;
+    --color-bronze: #85749a;
+    --color-bronze-light: #9e8eb3;
+    --color-gold: #b3a0cc;
+    --color-gold-soft: #cbbbe0;
+    --color-gold-dim: #8f7ea8;
+    --color-parchment: #dbd5e3;
+    --color-parchment-bright: #eae6f0;
+    --color-muted: #9a90a8;
+    --color-faint: #80768d;
+    --color-card: #1d1923;
+    --color-card-hover: #251f2c;
+    --color-card-inset: #181520;
+    --color-line-bronze: #473c55;
+    --color-mark-border: #61527a;
+    --color-numeral-hover: #4d4160;
+    --color-parchment-dim: #c3bacf;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 [x-cloak] {

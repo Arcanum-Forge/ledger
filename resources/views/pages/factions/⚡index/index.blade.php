@@ -10,16 +10,16 @@
 
     <x-summary-cards>
         <x-summary-card label="Factions Shown">
-            <p class="font-serif text-3xl text-[#d8c8a8]">{{ $summary['total'] }}</p>
+            <p class="font-serif text-3xl text-parchment">{{ $summary['total'] }}</p>
         </x-summary-card>
         <x-summary-card label="Average Influence">
-            <p class="font-serif text-3xl text-[#d8c8a8]">{{ $summary['avgInfluence'] }}</p>
+            <p class="font-serif text-3xl text-parchment">{{ $summary['avgInfluence'] }}</p>
         </x-summary-card>
         <x-summary-card label="Most Influential" :last="true">
-            <p class="font-serif text-lg text-[#b98967]">
+            <p class="font-serif text-lg text-gold">
                 {{ $summary['mostInfluential']?->name ?? '—' }}
                 @if ($summary['mostInfluential'])
-                    <span class="text-sm text-[#756d5e]">({{ $summary['mostInfluential']->influence }})</span>
+                    <span class="text-sm text-faint">({{ $summary['mostInfluential']->influence }})</span>
                 @endif
             </p>
         </x-summary-card>
@@ -47,12 +47,12 @@
     </x-filter-panel>
 
     {{-- Table --}}
-    <div class="border border-[#2c2922] bg-[#151310]">
+    <div class="border border-line bg-card">
         {{-- Desktop / Tablet --}}
         <div class="hidden overflow-x-auto md:block">
             <table class="w-full min-w-[800px] text-left">
                 <thead>
-                    <tr class="border-b border-[#2c2922] text-[8px] uppercase tracking-[0.2em] text-[#625744]">
+                    <tr class="border-b border-line text-[8px] uppercase tracking-[0.2em] text-faint">
                         @foreach (['name' => 'Name', 'alignment' => 'Alignment', 'influence' => 'Influence', 'status' => 'Status'] as $col => $label)
                             <x-sortable-th :column="$col" :label="$label" :sort-by="$sortBy"
                                 :sort-direction="$sortDirection" />
@@ -64,23 +64,24 @@
                     </tr>
                 </thead>
 
-                <tbody class="divide-y divide-[#2c2922]/60">
+                <tbody class="divide-y divide-line/60">
                     @forelse ($factions as $faction)
-                        <tr class="transition hover:bg-[#191611]">
+                        <tr class="transition hover:bg-card-hover">
                             <td class="px-5 py-4">
                                 <button wire:click="openView('{{ $faction->slug }}')" class="text-left">
-                                    <div class="font-serif text-sm text-[#ddd2bb]">{{ $faction->name }}</div>
-                                    <div class="text-[9px] uppercase tracking-[0.15em] text-[#625744]">{{ $faction->title }}
+                                    <div class="font-serif text-sm text-parchment">{{ $faction->name }}</div>
+                                    <div class="text-[9px] uppercase tracking-[0.15em] text-faint">{{ $faction->title }}
                                     </div>
                                 </button>
                             </td>
 
-                            <td class="px-5 py-4 text-[9px] uppercase tracking-[0.15em] text-[#8f826b]">
-                                {{ $faction->alignment }}</td>
-                            <td class="px-5 py-4 text-sm font-semibold text-[#d8c8a8]">{{ $faction->influence }}</td>
-                            <td class="px-5 py-4 text-xs text-[#8f826b]">{{ $faction->status }}</td>
-                            <td class="px-5 py-4 text-xs text-[#8f826b]">{{ $faction->kingdom->name ?? 'Unknown' }}</td>
-                            <td class="px-5 py-4 text-xs text-[#8f826b]">{{ $faction->leader->name ?? 'Unknown' }}</td>
+                            <td class="px-5 py-4 text-[9px] uppercase tracking-[0.15em] text-muted">
+                                {{ $faction->alignment }}
+                            </td>
+                            <td class="px-5 py-4 text-sm font-semibold text-parchment">{{ $faction->influence }}</td>
+                            <td class="px-5 py-4 text-xs text-muted">{{ $faction->status }}</td>
+                            <td class="px-5 py-4 text-xs text-muted">{{ $faction->kingdom->name ?? 'Unknown' }}</td>
+                            <td class="px-5 py-4 text-xs text-muted">{{ $faction->leader->name ?? 'Unknown' }}</td>
 
                             <td class="px-5 py-4">
                                 <x-row-actions :id="$faction->slug" />
@@ -101,42 +102,43 @@
         </div>
 
         {{-- Mobile --}}
-        <div class="divide-y divide-[#2c2922]/60 md:hidden">
+        <div class="divide-y divide-line/60 md:hidden">
             @forelse ($factions as $faction)
                 <div class="p-5">
                     <div class="flex items-start justify-between gap-4">
                         <button wire:click="openView('{{ $faction->slug }}')" class="min-w-0 text-left">
-                            <div class="font-serif text-base text-[#ddd2bb]">{{ $faction->name }}</div>
-                            <div class="mt-1 text-[9px] uppercase tracking-[0.15em] text-[#625744]">{{ $faction->title }}
+                            <div class="font-serif text-base text-parchment">{{ $faction->name }}</div>
+                            <div class="mt-1 text-[9px] uppercase tracking-[0.15em] text-faint">{{ $faction->title }}
                             </div>
                         </button>
                         <div class="shrink-0 text-right">
-                            <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Influence</div>
-                            <div class="mt-1 text-sm font-semibold text-[#d8c8a8]">{{ $faction->influence }}</div>
+                            <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Influence</div>
+                            <div class="mt-1 text-sm font-semibold text-parchment">{{ $faction->influence }}</div>
                         </div>
                     </div>
 
                     <div class="mt-5 grid grid-cols-2 gap-x-6 gap-y-4">
                         <div>
-                            <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Headquarters</div>
-                            <div class="mt-1 text-xs text-[#8f826b]">{{ $faction->kingdom->name ?? 'Unknown' }}</div>
+                            <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Headquarters</div>
+                            <div class="mt-1 text-xs text-muted">{{ $faction->kingdom->name ?? 'Unknown' }}</div>
                         </div>
                         <div>
-                            <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Leader</div>
-                            <div class="mt-1 text-xs text-[#8f826b]">{{ $faction->leader->name ?? 'Unknown' }}</div>
+                            <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Leader</div>
+                            <div class="mt-1 text-xs text-muted">{{ $faction->leader->name ?? 'Unknown' }}</div>
                         </div>
                         <div>
-                            <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Status</div>
-                            <div class="mt-1 text-xs text-[#8f826b]">{{ $faction->status }}</div>
+                            <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Status</div>
+                            <div class="mt-1 text-xs text-muted">{{ $faction->status }}</div>
                         </div>
                         <div>
-                            <div class="text-[8px] uppercase tracking-[0.15em] text-[#625744]">Alignment</div>
-                            <div class="mt-1 text-[9px] uppercase tracking-[0.15em] text-[#8f826b]">
-                                {{ $faction->alignment }}</div>
+                            <div class="text-[8px] uppercase tracking-[0.15em] text-faint">Alignment</div>
+                            <div class="mt-1 text-[9px] uppercase tracking-[0.15em] text-muted">
+                                {{ $faction->alignment }}
+                            </div>
                         </div>
                     </div>
 
-                    <div class="mt-5 flex items-center justify-end gap-5 border-t border-[#2c2922]/60 pt-4">
+                    <div class="mt-5 flex items-center justify-end gap-5 border-t border-line/60 pt-4">
                         <x-row-actions :id="$faction->slug" />
                     </div>
                 </div>
@@ -156,28 +158,28 @@
         @if ($showModal)
             @if ($modalMode === 'view' && $selected)
                 <div class="mb-6 flex items-center gap-3">
-                    <span class="h-px w-8 bg-[#806337]"></span>
-                    <span class="text-[9px] uppercase tracking-[0.28em] text-[#a17e43]">{{ $selected->type }}</span>
+                    <span class="h-px w-8 bg-line"></span>
+                    <span class="text-[9px] uppercase tracking-[0.28em] text-gold-dim">{{ $selected->type }}</span>
                 </div>
 
-                <h2 class="font-serif text-3xl text-[#e8dfca]">{{ $selected->name }}</h2>
-                <p class="mt-1 text-xs uppercase tracking-[0.2em] text-[#806337]">{{ $selected->title }}</p>
-                <p class="mt-5 text-sm leading-7 text-[#8f826b]">{{ $selected->description ?? 'No description recorded.' }}</p>
+                <h2 class="font-serif text-3xl text-parchment-bright">{{ $selected->name }}</h2>
+                <p class="mt-1 text-xs uppercase tracking-[0.2em] text-line">{{ $selected->title }}</p>
+                <p class="mt-5 text-sm leading-7 text-muted">{{ $selected->description ?? 'No description recorded.' }}</p>
 
-                <div class="mt-7 grid grid-cols-2 gap-5 border-t border-[#2c2922] pt-6 text-xs">
+                <div class="mt-7 grid grid-cols-2 gap-5 border-t border-line pt-6 text-xs">
                     <x-detail-item label="Leader">{{ $selected->leader->name ?? 'Unknown' }}</x-detail-item>
                     <x-detail-item label="Headquarters">{{ $selected->kingdom->name ?? 'Unknown' }}</x-detail-item>
                     <x-detail-item label="Members">{{ $selected->members ?? 'Unconfirmed' }}</x-detail-item>
                     <x-detail-item label="Alignment">{{ $selected->alignment }}</x-detail-item>
                     <x-detail-item label="Influence"
-                        class="font-semibold text-[#d8c8a8]">{{ $selected->influence }}</x-detail-item>
+                        class="font-semibold text-parchment">{{ $selected->influence }}</x-detail-item>
                     <x-detail-item label="Status">{{ $selected->status }}</x-detail-item>
                 </div>
 
                 @if ($selected->status_description)
-                    <div class="mt-5 border-t border-[#2c2922] pt-5">
-                        <p class="mb-1.5 text-[9px] uppercase tracking-[0.2em] text-[#625744]">Latest Report</p>
-                        <p class="text-sm leading-7 text-[#8f826b]">{{ $selected->status_description }}</p>
+                    <div class="mt-5 border-t border-line pt-5">
+                        <p class="mb-1.5 text-[9px] uppercase tracking-[0.2em] text-faint">Latest Report</p>
+                        <p class="text-sm leading-7 text-muted">{{ $selected->status_description }}</p>
                     </div>
                 @endif
 
@@ -188,13 +190,13 @@
 
             @elseif ($modalMode === 'delete' && $selected)
                 <div class="mb-6 flex items-center gap-3">
-                    <span class="h-px w-8 bg-[#c14545]/60"></span>
-                    <span class="text-[9px] uppercase tracking-[0.28em] text-[#c14545]">Strike from the Record</span>
+                    <span class="h-px w-8 bg-danger/60"></span>
+                    <span class="text-[9px] uppercase tracking-[0.28em] text-danger">Strike from the Record</span>
                 </div>
 
-                <h2 class="font-serif text-2xl text-[#e8dfca]">Remove {{ $selected->name }}?</h2>
-                <p class="mt-3 text-sm leading-6 text-[#8f826b]">
-                    This permanently erases <span class="text-[#cdbd9e]">{{ $selected->name }}</span>,
+                <h2 class="font-serif text-2xl text-parchment-bright">Remove {{ $selected->name }}?</h2>
+                <p class="mt-3 text-sm leading-6 text-muted">
+                    This permanently erases <span class="text-parchment-dim">{{ $selected->name }}</span>,
                     {{ $selected->title }}, from the archive. This cannot be undone.
                 </p>
 
@@ -208,7 +210,7 @@
                 </div>
 
             @else
-                <h2 class="mb-6 font-serif text-2xl text-[#e8dfca]">
+                <h2 class="mb-6 font-serif text-2xl text-parchment-bright">
                     {{ $modalMode === 'edit' ? 'Amend Record' : 'Record a New Faction' }}
                 </h2>
 
@@ -226,7 +228,7 @@
                                 select-action="selectLeaderForm" clear-action="clearLeaderForm" clear-label="Unknown"
                                 option-label-key="label" />
                             @error('leaderId')
-                            <p class="mt-1.5 text-[10px] text-[#c14545]">{{ $message }}</p> @enderror
+                            <p class="mt-1.5 text-[10px] text-danger">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
@@ -237,7 +239,7 @@
                                 :selected-name="$kingdomName" select-action="selectKingdomForm" clear-action="clearKingdomForm"
                                 clear-label="Unknown" option-label-key="label" />
                             @error('kingdomId')
-                            <p class="mt-1.5 text-[10px] text-[#c14545]">{{ $message }}</p> @enderror
+                            <p class="mt-1.5 text-[10px] text-danger">{{ $message }}</p> @enderror
                         </div>
                         <x-text-input model="members" label="Members" placeholder="e.g. 8,400" />
                     </div>

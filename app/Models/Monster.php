@@ -57,10 +57,10 @@ class Monster extends Model
     {
         return Attribute::make(
             get: fn() => match ($this->threat) {
-                'Extreme' => 'text-[#c14545]',
-                'High' => 'text-[#b98967]',
-                'Moderate' => 'text-[#c59b4a]',
-                default => 'text-[#8f826b]',
+                'Extreme' => 'text-threat-critical',
+                'High' => 'text-threat-high',
+                'Moderate' => 'text-threat-mid',
+                default => 'text-muted',
             },
         );
     }

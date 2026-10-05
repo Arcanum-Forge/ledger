@@ -1,21 +1,22 @@
+{{-- dashboard/panel.blade.php --}}
 @props([
     'title',
     'href',
 ])
 
-<div class="border border-[#2c2922] bg-[#151310]">
-    <div class="flex items-center justify-between border-b border-[#2c2922] px-5 py-4">
-        <p class="text-[9px] uppercase tracking-[0.25em] text-[#806337]">
+<div class="border border-line bg-card">
+    <div class="flex items-center justify-between border-b border-line px-5 py-4">
+        <p class="text-[10px] uppercase tracking-[0.25em] text-gold-dim">
             {{ $title }}
         </p>
 
         <a href="{{ $href }}" wire:navigate
-            class="text-[9px] uppercase tracking-[0.15em] text-[#857861] hover:text-[#c59b4a]">
+            class="text-[10px] uppercase tracking-[0.15em] text-muted transition hover:text-gold">
             View all →
         </a>
     </div>
 
-    <div class="divide-y divide-[#2c2922]/60">
+    <div class="divide-y divide-line/60">
         {{ $slot }}
     </div>
 </div>

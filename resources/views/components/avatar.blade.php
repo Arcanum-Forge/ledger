@@ -1,3 +1,4 @@
+{{-- avatar.blade.php --}}
 @props(['user', 'size' => 'md'])
 
 @php
@@ -9,6 +10,6 @@
 @endphp
 
 <span
-    class="flex shrink-0 items-center justify-center rounded-full bg-[#806337]/20 font-semibold uppercase text-[#c59b4a] {{ $sizes[$size] ?? $sizes['md'] }}">
+    class="flex shrink-0 items-center justify-center rounded-full bg-bronze/20 font-semibold uppercase text-gold {{ $sizes[$size] ?? $sizes['md'] }}">
     {{ $user->initials() }}
 </span>

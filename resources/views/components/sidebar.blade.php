@@ -1,4 +1,4 @@
-<aside x-data class="flex h-full w-64 flex-col bg-[#19160f]">
+<div class="flex h-full flex-col">
     <x-sidebar.brand />
 
     <nav class="flex-1 overflow-y-auto px-3 py-6">
@@ -22,11 +22,11 @@
             <x-sidebar.nav-link route="threat-reports.index" icon="tabler-alert-triangle" label="Threat Reports" />
         </x-sidebar.nav-section>
 
-
         <x-sidebar.nav-section title="The Keepers">
             <x-sidebar.nav-link route="users.index" icon="tabler-users" label="Users" />
         </x-sidebar.nav-section>
 
     </nav>
+
     <x-sidebar.footer />
-</aside>
+</div>
