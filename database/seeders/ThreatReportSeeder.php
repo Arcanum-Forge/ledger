@@ -109,6 +109,7 @@ class ThreatReportSeeder extends Seeder
                 'kingdom_id' => $kingdomId($report['kingdom']),
                 'type' => $report['type'],
                 'level' => $report['level'],
+                'level_severity' => ThreatReport::LEVELS[$report['level']],
                 'status' => $report['status'],
                 'sightings' => $report['sightings'],
                 'description' => $report['description'],

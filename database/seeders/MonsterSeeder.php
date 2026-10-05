@@ -108,6 +108,7 @@ class MonsterSeeder extends Seeder
                 'habitat' => $monster['habitat'],
                 'kingdom_id' => $kingdomId($monster['kingdom']),
                 'threat' => $monster['threat'],
+                'threat_level' => Monster::THREAT_LEVELS[$monster['threat']],
                 'sightings' => $monster['sightings'],
                 'status' => $monster['status'],
                 'description' => $monster['description'],

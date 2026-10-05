@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'sightings',
     'status',
     'description',
+    'threat_level',
 ])]
 class Monster extends Model
 {
@@ -35,16 +36,17 @@ class Monster extends Model
     }
 
     /** Severity order for the 'threat' string — worst first. */
-    public const THREAT_LEVELS = ['Low', 'Moderate', 'High', 'Extreme'];
+    public const THREAT_LEVELS = [
+        'Low' => 1,
+        'Moderate' => 2,
+        'High' => 3,
+        'Extreme' => 4,
+    ];
 
     protected static function booted(): void
     {
-        // threat is a free-form label; threat_level is what everything
-        // actually sorts and orders by, since 'Extreme' < 'High'
-        // alphabetically would sort backwards from real severity.
         static::saving(function (Monster $monster) {
-            $index = array_search($monster->threat, self::THREAT_LEVELS, true);
-            $monster->threat_level = $index === false ? 0 : $index + 1;
+            $monster->threat_level = self::THREAT_LEVELS[$monster->threat] ?? 0;
         });
     }
 

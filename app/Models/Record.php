@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'author_id',
     'importance',
     'confidential',
+    'importance_level',
 ])]
 class Record extends Model
 {
@@ -35,17 +36,17 @@ class Record extends Model
     }
 
     /** Significance order for the 'importance' string — least significant first. */
-    public const IMPORTANCE_LEVELS = ['Notable', 'Important', 'Critical'];
+    public const IMPORTANCE_LEVELS = [
+        'Notable' => 1,
+        'Important' => 2,
+        'Critical' => 3,
+    ];
 
     protected static function booted(): void
     {
-        // importance is a free-form label; importance_level is what
-        // everything actually sorts and orders by, since alphabetical order
-        // (Critical, Important, Notable) doesn't match real significance
-        // (Notable < Important < Critical).
         static::saving(function (Record $record) {
-            $index = array_search($record->importance, self::IMPORTANCE_LEVELS, true);
-            $record->importance_level = $index === false ? 0 : $index + 1;
+            $record->importance_level =
+                self::IMPORTANCE_LEVELS[$record->importance] ?? 0;
         });
     }
 

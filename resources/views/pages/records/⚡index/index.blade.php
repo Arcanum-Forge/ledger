@@ -64,7 +64,7 @@
                 placeholder="Any" />
 
             <div>
-                <label class="mb-1.5 block text-[9px] uppercase tracking-[0.2em] text-line">Access</label>
+                <label class="mb-1.5 block text-[9px] uppercase tracking-[0.2em] text-gold-dim">Access</label>
                 <select wire:model.live="confidentialFilter"
                     class="w-full border border-line bg-card-inset px-3 py-2.5 text-xs text-parchment-bright outline-none focus:border-line">
                     <option value="">Any</option>

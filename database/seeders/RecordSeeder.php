@@ -37,6 +37,7 @@ TEXT,
             'date' => 'Year 411',
             'author_id' => $authorId('Royal Historians'),
             'importance' => 'Critical',
+            'importance_level' => Record::IMPORTANCE_LEVELS['Critical'],
             'confidential' => false,
         ]);
 
@@ -56,6 +57,7 @@ TEXT,
             'date' => 'Year 623',
             'author_id' => $authorId('Royal Archive'),
             'importance' => 'Important',
+            'importance_level' => Record::IMPORTANCE_LEVELS['Important'],
             'confidential' => false,
         ]);
 
@@ -77,6 +79,7 @@ TEXT,
             'date' => 'Unknown',
             'author_id' => $authorId('Unknown'),
             'importance' => 'Notable',
+            'importance_level' => Record::IMPORTANCE_LEVELS['Notable'],
             'confidential' => true,
         ]);
 
@@ -96,6 +99,7 @@ TEXT,
             'date' => 'Year 781',
             'author_id' => $authorId('Brother Cael'),
             'importance' => 'Notable',
+            'importance_level' => Record::IMPORTANCE_LEVELS['Notable'],
             'confidential' => false,
         ]);
 
@@ -115,6 +119,7 @@ TEXT,
             'date' => 'Year 512–529',
             'author_id' => $authorId('Eastern Archives'),
             'importance' => 'Critical',
+            'importance_level' => Record::IMPORTANCE_LEVELS['Critical'],
             'confidential' => false,
         ]);
 
@@ -134,6 +139,7 @@ TEXT,
             'date' => 'Year 302',
             'author_id' => $authorId('Temple Records'),
             'importance' => 'Important',
+            'importance_level' => Record::IMPORTANCE_LEVELS['Important'],
             'confidential' => false,
         ]);
 
@@ -151,6 +157,7 @@ TEXT,
             'date' => 'Year 12',
             'author_id' => $authorId('Emerald Circle'),
             'importance' => 'Important',
+            'importance_level' => Record::IMPORTANCE_LEVELS['Important'],
             'confidential' => false,
         ]);
 
@@ -170,6 +177,7 @@ TEXT,
             'date' => 'Unknown',
             'author_id' => $authorId('Unknown'),
             'importance' => 'Critical',
+            'importance_level' => Record::IMPORTANCE_LEVELS['Critical'],
             'confidential' => true,
         ]);
     }

@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'status',
     'sightings',
     'description',
+    'level_severity',
 ])]
 class ThreatReport extends Model
 {
@@ -36,17 +37,18 @@ class ThreatReport extends Model
     }
 
     /** Severity order for the 'level' string — least severe first. */
-    public const LEVELS = ['Elevated', 'Severe', 'Critical', 'Moderate'];
+    public const LEVELS = [
+        'Elevated' => 1,
+        'Severe' => 2,
+        'Critical' => 3,
+        'Moderate' => 4,
+    ];
 
     protected static function booted(): void
     {
-        // level is a free-form label; level_severity is what everything
-        // actually sorts and orders by, since alphabetical order
-        // (Critical, Elevated, Severe) doesn't match real severity
-        // (Elevated < Severe < Critical).
         static::saving(function (ThreatReport $report) {
-            $index = array_search($report->level, self::LEVELS, true);
-            $report->level_severity = $index === false ? 0 : $index + 1;
+            $report->level_severity =
+                self::LEVELS[$report->level] ?? 0;
         });
     }
 
