@@ -1,10 +1,13 @@
 <?php
+// {{-- authors/index.php --}}
 
 use App\Livewire\Concerns\HasCursorPagination;
 use App\Livewire\Concerns\HasModalCrud;
 use App\Models\Author;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Cursor;
+use Illuminate\Pagination\CursorPaginator;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -45,6 +48,57 @@ new
         {
             $this->reset(['search', 'minRecords', 'maxRecords']);
             $this->cursor = null;
+        }
+
+        /**
+         * Islands can't see variables passed from render() (they only see
+         * component state), so everything an island needs is exposed as a
+         * computed property and read via $this-> in the template.
+         * Computed values are memoized per request, so the query runs once
+         * even if several islands read it.
+         */
+        #[Computed]
+        public function filtersActive(): bool
+        {
+            return $this->search !== '' || $this->minRecords > 0 || $this->maxRecords < 100;
+        }
+
+        #[Computed]
+        public function total(): int
+        {
+            return (clone $this->filteredQuery())->count();
+        }
+
+        /**
+         * The heavy part (loads the whole filtered set to average it) —
+         * this is what the lazy summary island defers past first paint.
+         */
+        #[Computed]
+        public function summary(): array
+        {
+            $filtered = $this->filteredQuery();
+
+            // avgRecords is computed in PHP over the fetched collection rather
+            // than via a SQL avg(), because 'records_count' is a withCount()
+            // alias — see filteredQuery() for why we avoid having().
+            return [
+                'total' => $this->total,
+                'avgRecords' => (int) round((clone $filtered)->get()->avg('records_count') ?? 0),
+                'mostRecords' => (clone $filtered)->orderByDesc('records_count')->first(),
+            ];
+        }
+
+        #[Computed]
+        public function authors(): CursorPaginator
+        {
+            return $this->filteredQuery()
+                ->orderBy($this->sortBy, $this->sortDirection)
+                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
+                ->cursorPaginate(
+                    perPage: 10,
+                    cursorName: 'cursor',
+                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
+                );
         }
 
         /**
@@ -108,6 +162,7 @@ new
             session()->flash('success', 'Author record removed from the archive.');
 
             $this->closeModal();
+            $this->refreshIslands();
         }
 
         public function save(): void
@@ -124,6 +179,21 @@ new
             }
 
             $this->closeModal();
+            $this->refreshIslands();
+        }
+
+        /**
+         * save()/confirmDelete() run from inside the modal island, so by
+         * default only the modal re-renders. Push the data islands too.
+         * Bust the memoized computeds first so they re-query after the write.
+         */
+        protected function refreshIslands(): void
+        {
+            unset($this->authors, $this->summary, $this->total);
+
+            $this->renderIsland('flash');
+            $this->renderIsland('summary');
+            $this->renderIsland('table');
         }
 
         protected function fillForm(Author $author): void
@@ -141,33 +211,4 @@ new
             $this->resetErrorBag();
         }
 
-        public function render()
-        {
-            $filtered = $this->filteredQuery();
-
-            // avgRecords is computed in PHP over the fetched collection rather
-            // than via a SQL avg(), because 'records_count' is a withCount()
-            // alias — an aggregate() query against it only round-trips
-            // correctly through Laravel's having-wrapping path, which we're
-            // deliberately not using (see filteredQuery()).
-            $summary = [
-                'total' => (clone $filtered)->count(),
-                'avgRecords' => (int) round((clone $filtered)->get()->avg('records_count') ?? 0),
-                'mostRecords' => (clone $filtered)->orderByDesc('records_count')->first(),
-            ];
-
-            $authors = $filtered
-                ->orderBy($this->sortBy, $this->sortDirection)
-                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
-                ->cursorPaginate(
-                    perPage: 10,
-                    cursorName: 'cursor',
-                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
-                );
-
-            return $this->view([
-                'authors' => $authors,
-                'summary' => $summary,
-            ]);
-        }
     };

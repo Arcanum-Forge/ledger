@@ -1,4 +1,4 @@
-{{-- components/ledger-mark.blade.php --}}
+{{-- ledger-mark.blade.php --}}
 @props(['size' => 'md']) {{-- sm | md --}}
 
 @php

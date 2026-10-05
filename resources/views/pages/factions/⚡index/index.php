@@ -1,4 +1,5 @@
 <?php
+// {{-- factions/index.php --}}
 
 use App\Livewire\Concerns\HasCursorPagination;
 use App\Livewire\Concerns\HasModalCrud;
@@ -8,6 +9,7 @@ use App\Models\Kingdom;
 use App\Models\Leader;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Cursor;
+use Illuminate\Pagination\CursorPaginator;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -220,6 +222,54 @@ new
         }
 
         /**
+         * Islands can't see variables passed from render(), so everything
+         * they need is exposed as a computed property and read via $this->.
+         * Computed values are memoized per request.
+         */
+        #[Computed]
+        public function filtersActive(): bool
+        {
+            return $this->search !== ''
+                || $this->alignmentFilter !== ''
+                || $this->kingdomFilter !== ''
+                || $this->leaderFilter !== ''
+                || $this->minInfluence > 0
+                || $this->maxInfluence < 100;
+        }
+
+        #[Computed]
+        public function total(): int
+        {
+            return (clone $this->filteredQuery())->count();
+        }
+
+        #[Computed]
+        public function summary(): array
+        {
+            $filtered = $this->filteredQuery();
+
+            return [
+                'total' => $this->total,
+                'avgInfluence' => (int) round((clone $filtered)->avg('influence') ?? 0),
+                'mostInfluential' => (clone $filtered)->orderByDesc('influence')->first(),
+            ];
+        }
+
+        #[Computed]
+        public function factions(): CursorPaginator
+        {
+            return $this->filteredQuery()
+                ->with(['kingdom', 'leader'])
+                ->orderBy($this->sortBy, $this->sortDirection)
+                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
+                ->cursorPaginate(
+                    perPage: 10,
+                    cursorName: 'cursor',
+                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
+                );
+        }
+
+        /**
          * Shared filtered query — used both for the paginated list and the
          * summary aggregates, so the summary always reflects what's filtered,
          * not the whole table.
@@ -284,6 +334,7 @@ new
             session()->flash('success', 'Faction record removed from the archive.');
 
             $this->closeModal();
+            $this->refreshIslands();
         }
 
         public function save(): void
@@ -305,6 +356,21 @@ new
             }
 
             $this->closeModal();
+            $this->refreshIslands();
+        }
+
+        /**
+         * save()/confirmDelete() run from inside the modal island, so by
+         * default only the modal re-renders. Push the other islands too,
+         * busting the memoized computeds first so they re-query.
+         */
+        protected function refreshIslands(): void
+        {
+            unset($this->factions, $this->summary, $this->total);
+
+            $this->renderIsland('flash');
+            $this->renderIsland('summary');
+            $this->renderIsland('table');
         }
 
         protected function fillForm(Faction $faction): void
@@ -337,30 +403,5 @@ new
             $this->clearRelation('leader-form');
             $this->resetErrorBag();
         }
-
-        public function render()
-        {
-            $filtered = $this->filteredQuery();
-
-            $summary = [
-                'total' => (clone $filtered)->count(),
-                'avgInfluence' => (int) round((clone $filtered)->avg('influence') ?? 0),
-                'mostInfluential' => (clone $filtered)->orderByDesc('influence')->first(),
-            ];
-
-            $factions = $filtered
-                ->with(['kingdom', 'leader'])
-                ->orderBy($this->sortBy, $this->sortDirection)
-                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
-                ->cursorPaginate(
-                    perPage: 10,
-                    cursorName: 'cursor',
-                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
-                );
-
-            return $this->view([
-                'factions' => $factions,
-                'summary' => $summary,
-            ]);
-        }
+        
     };

@@ -1,11 +1,13 @@
 <?php
-
+// {{-- users/index.php --}}
 use App\Livewire\Concerns\HasCursorPagination;
 use App\Livewire\Concerns\HasModalCrud;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Cursor;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -48,6 +50,48 @@ new
         {
             $this->reset(['search', 'verifiedFilter']);
             $this->cursor = null;
+        }
+
+        /**
+         * Islands can't see variables passed from render(), so everything
+         * they need is exposed as a computed property and read via $this->.
+         * Computed values are memoized per request.
+         */
+        #[Computed]
+        public function filtersActive(): bool
+        {
+            return $this->search !== '' || $this->verifiedFilter !== '';
+        }
+
+        #[Computed]
+        public function total(): int
+        {
+            return (clone $this->filteredQuery())->count();
+        }
+
+        #[Computed]
+        public function summary(): array
+        {
+            $filtered = $this->filteredQuery();
+
+            return [
+                'total' => $this->total,
+                'verifiedCount' => (clone $filtered)->whereNotNull('email_verified_at')->count(),
+                'newest' => (clone $filtered)->orderByDesc('created_at')->orderByDesc('id')->first(),
+            ];
+        }
+
+        #[Computed]
+        public function users(): CursorPaginator
+        {
+            return $this->filteredQuery()
+                ->orderBy($this->sortBy, $this->sortDirection)
+                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
+                ->cursorPaginate(
+                    perPage: 10,
+                    cursorName: 'cursor',
+                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
+                );
         }
 
         /**
@@ -102,6 +146,7 @@ new
             $this->selected?->delete();
             session()->flash('success', 'User record removed from the archive.');
             $this->closeModal();
+            $this->refreshIslands();
         }
 
         public function save(): void
@@ -126,6 +171,21 @@ new
             }
 
             $this->closeModal();
+            $this->refreshIslands();
+        }
+
+        /**
+         * save()/confirmDelete() run from inside the modal island, so by
+         * default only the modal re-renders. Push the other islands too,
+         * busting the memoized computeds first so they re-query.
+         */
+        protected function refreshIslands(): void
+        {
+            unset($this->users, $this->summary, $this->total);
+
+            $this->renderIsland('flash');
+            $this->renderIsland('summary');
+            $this->renderIsland('table');
         }
 
         protected function fillForm(User $user): void
@@ -146,28 +206,4 @@ new
             $this->resetErrorBag();
         }
 
-        public function render()
-        {
-            $filtered = $this->filteredQuery();
-
-            $summary = [
-                'total' => (clone $filtered)->count(),
-                'verifiedCount' => (clone $filtered)->whereNotNull('email_verified_at')->count(),
-                'newest' => (clone $filtered)->orderByDesc('created_at')->orderByDesc('id')->first(),
-            ];
-
-            $users = $filtered
-                ->orderBy($this->sortBy, $this->sortDirection)
-                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
-                ->cursorPaginate(
-                    perPage: 10,
-                    cursorName: 'cursor',
-                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
-                );
-
-            return $this->view([
-                'users' => $users,
-                'summary' => $summary,
-            ]);
-        }
     };

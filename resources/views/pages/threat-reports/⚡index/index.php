@@ -1,5 +1,5 @@
 <?php
-
+// {{-- threat-reports/index.php --}}
 use App\Livewire\Concerns\HasCursorPagination;
 use App\Livewire\Concerns\HasModalCrud;
 use App\Livewire\Concerns\HasSearchableRelations;
@@ -8,6 +8,7 @@ use App\Models\Region;
 use App\Models\ThreatReport;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Cursor;
+use Illuminate\Pagination\CursorPaginator;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -219,6 +220,59 @@ new
         }
 
         /**
+         * Islands can't see variables passed from render(), so everything
+         * they need is exposed as a computed property and read via $this->.
+         * Computed values are memoized per request.
+         */
+        #[Computed]
+        public function filtersActive(): bool
+        {
+            return $this->search !== ''
+                || $this->typeFilter !== ''
+                || $this->levelFilter !== ''
+                || $this->statusFilter !== ''
+                || $this->regionFilter !== ''
+                || $this->kingdomFilter !== ''
+                || $this->minSightings > 0
+                || $this->maxSightings < 100;
+        }
+
+        #[Computed]
+        public function total(): int
+        {
+            return (clone $this->filteredQuery())->count();
+        }
+
+        #[Computed]
+        public function summary(): array
+        {
+            $filtered = $this->filteredQuery();
+
+            return [
+                'total' => $this->total,
+                'avgSightings' => (int) round((clone $filtered)->avg('sightings') ?? 0),
+                'mostSevere' => (clone $filtered)
+                    ->orderByDesc('level_severity')
+                    ->orderByDesc('sightings')
+                    ->first(),
+            ];
+        }
+
+        #[Computed]
+        public function reports(): CursorPaginator
+        {
+            return $this->filteredQuery()
+                ->with(['region', 'kingdom'])
+                ->orderBy($this->sortColumn(), $this->sortDirection)
+                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
+                ->cursorPaginate(
+                    perPage: 10,
+                    cursorName: 'cursor',
+                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
+                );
+        }
+
+        /**
          * level is a free-form label ('Elevated'..'Critical'); the actual
          * sortable column is level_severity (see ThreatReport::booted()),
          * since alphabetical order doesn't match real severity, and
@@ -293,6 +347,7 @@ new
             $this->selected?->delete();
             session()->flash('success', 'Threat report removed from the archive.');
             $this->closeModal();
+            $this->refreshIslands();
         }
 
         public function save(): void
@@ -314,6 +369,21 @@ new
             }
 
             $this->closeModal();
+            $this->refreshIslands();
+        }
+
+        /**
+         * save()/confirmDelete() run from inside the modal island, so by
+         * default only the modal re-renders. Push the other islands too,
+         * busting the memoized computeds first so they re-query.
+         */
+        protected function refreshIslands(): void
+        {
+            unset($this->reports, $this->summary, $this->total);
+
+            $this->renderIsland('flash');
+            $this->renderIsland('summary');
+            $this->renderIsland('table');
         }
 
         protected function fillForm(ThreatReport $threatReport): void
@@ -345,32 +415,4 @@ new
             $this->resetErrorBag();
         }
 
-        public function render()
-        {
-            $filtered = $this->filteredQuery();
-
-            $summary = [
-                'total' => (clone $filtered)->count(),
-                'avgSightings' => (int) round((clone $filtered)->avg('sightings') ?? 0),
-                'mostSevere' => (clone $filtered)
-                    ->orderByDesc('level_severity')
-                    ->orderByDesc('sightings')
-                    ->first(),
-            ];
-
-            $reports = $filtered
-                ->with(['region', 'kingdom'])
-                ->orderBy($this->sortColumn(), $this->sortDirection)
-                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
-                ->cursorPaginate(
-                    perPage: 10,
-                    cursorName: 'cursor',
-                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
-                );
-
-            return $this->view([
-                'reports' => $reports,
-                'summary' => $summary,
-            ]);
-        }
     };

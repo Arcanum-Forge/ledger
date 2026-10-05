@@ -1,5 +1,5 @@
 <?php
-
+// {{-- monsters/index.php --}}
 use App\Livewire\Concerns\HasCursorPagination;
 use App\Livewire\Concerns\HasModalCrud;
 use App\Livewire\Concerns\HasSearchableRelations;
@@ -7,6 +7,7 @@ use App\Models\Kingdom;
 use App\Models\Monster;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Cursor;
+use Illuminate\Pagination\CursorPaginator;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -157,6 +158,58 @@ new
         }
 
         /**
+         * Islands can't see variables passed from render(), so everything
+         * they need is exposed as a computed property and read via $this->.
+         * Computed values are memoized per request.
+         */
+        #[Computed]
+        public function filtersActive(): bool
+        {
+            return $this->search !== ''
+                || $this->classificationFilter !== ''
+                || $this->habitatFilter !== ''
+                || $this->threatFilter !== ''
+                || $this->kingdomFilter !== ''
+                || $this->minSightings > 0
+                || $this->maxSightings < 150;
+        }
+
+        #[Computed]
+        public function total(): int
+        {
+            return (clone $this->filteredQuery())->count();
+        }
+
+        #[Computed]
+        public function summary(): array
+        {
+            $filtered = $this->filteredQuery();
+
+            return [
+                'total' => $this->total,
+                'avgSightings' => (int) round((clone $filtered)->avg('sightings') ?? 0),
+                'mostThreatening' => (clone $filtered)
+                    ->orderByDesc('threat_level')
+                    ->orderByDesc('sightings')
+                    ->first(),
+            ];
+        }
+
+        #[Computed]
+        public function monsters(): CursorPaginator
+        {
+            return $this->filteredQuery()
+                ->with('kingdom')
+                ->orderBy($this->sortColumn(), $this->sortDirection)
+                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
+                ->cursorPaginate(
+                    perPage: 10,
+                    cursorName: 'cursor',
+                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
+                );
+        }
+
+        /**
          * threat is a free-form label ('Low'..'Extreme'); the actual sortable
          * column is threat_level (see Monster::booted()), since 'Extreme'
          * sorting before 'High' alphabetically is backwards from real
@@ -230,6 +283,7 @@ new
             session()->flash('success', 'Monster record removed from the archive.');
 
             $this->closeModal();
+            $this->refreshIslands();
         }
 
         public function save(): void
@@ -250,6 +304,21 @@ new
             }
 
             $this->closeModal();
+            $this->refreshIslands();
+        }
+
+        /**
+         * save()/confirmDelete() run from inside the modal island, so by
+         * default only the modal re-renders. Push the other islands too,
+         * busting the memoized computeds first so they re-query.
+         */
+        protected function refreshIslands(): void
+        {
+            unset($this->monsters, $this->summary, $this->total);
+
+            $this->renderIsland('flash');
+            $this->renderIsland('summary');
+            $this->renderIsland('table');
         }
 
         protected function fillForm(Monster $monster): void
@@ -279,32 +348,4 @@ new
             $this->resetErrorBag();
         }
 
-        public function render()
-        {
-            $filtered = $this->filteredQuery();
-
-            $summary = [
-                'total' => (clone $filtered)->count(),
-                'avgSightings' => (int) round((clone $filtered)->avg('sightings') ?? 0),
-                'mostThreatening' => (clone $filtered)
-                    ->orderByDesc('threat_level')
-                    ->orderByDesc('sightings')
-                    ->first(),
-            ];
-
-            $monsters = $filtered
-                ->with('kingdom')
-                ->orderBy($this->sortColumn(), $this->sortDirection)
-                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
-                ->cursorPaginate(
-                    perPage: 10,
-                    cursorName: 'cursor',
-                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
-                );
-
-            return $this->view([
-                'monsters' => $monsters,
-                'summary' => $summary,
-            ]);
-        }
     };

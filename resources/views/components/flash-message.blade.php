@@ -1,7 +1,10 @@
 {{-- flash-message.blade.php --}}
+@props(['floating' => false])
+
 @if (session()->has('success'))
-    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition role="status"
-        class="mb-6 border border-line-bronze bg-card px-5 py-4">
+    <div wire:key="flash-{{ uniqid() }}" x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)"
+        x-show="show" x-transition role="status"
+        class="{{ $floating ? 'shadow-lg shadow-black/40' : 'mb-6' }} border border-line-bronze bg-card px-5 py-4">
         <div class="flex items-center gap-3">
 
             <div class="flex h-8 w-8 shrink-0 items-center justify-center border border-line-bronze bg-surface">
@@ -17,8 +20,8 @@
                 </p>
             </div>
 
-            <button type="button" @click="show = false" class="shrink-0 text-faint transition hover:text-parchment-dim"
-                aria-label="Dismiss">
+            <button type="button" @click="show = false"
+                class="shrink-0 text-faint transition hover:text-parchment-dim" aria-label="Dismiss">
                 <x-tabler-x class="h-4 w-4" />
             </button>
 

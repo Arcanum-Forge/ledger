@@ -1,10 +1,12 @@
 <?php
-
+// {{-- rulers/index.php --}}
 use App\Livewire\Concerns\HasCursorPagination;
 use App\Livewire\Concerns\HasModalCrud;
 use App\Models\Ruler;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Cursor;
+use Illuminate\Pagination\CursorPaginator;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -100,6 +102,58 @@ new
         }
 
         /**
+         * Islands can't see variables passed from render(), so everything
+         * they need is exposed as a computed property and read via $this->.
+         * Computed values are memoized per request.
+         */
+        #[Computed]
+        public function filtersActive(): bool
+        {
+            return $this->search !== ''
+                || $this->honorificFilter !== ''
+                || $this->minKingdoms > 0
+                || $this->maxKingdoms < 100;
+        }
+
+        #[Computed]
+        public function total(): int
+        {
+            return (clone $this->filteredQuery())->count();
+        }
+
+        /**
+         * The heavy part (loads the whole filtered set to average it) —
+         * this is what the lazy summary island defers past first paint.
+         */
+        #[Computed]
+        public function summary(): array
+        {
+            $filtered = $this->filteredQuery();
+
+            // avgKingdoms is computed in PHP over the fetched collection rather
+            // than via a SQL avg(), because 'kingdoms_count' is a withCount()
+            // alias — see filteredQuery() for why we avoid having().
+            return [
+                'total' => $this->total,
+                'avgKingdoms' => (int) round((clone $filtered)->get()->avg('kingdoms_count') ?? 0),
+                'mostPopulous' => (clone $filtered)->orderByDesc('kingdoms_count')->first(),
+            ];
+        }
+
+        #[Computed]
+        public function rulers(): CursorPaginator
+        {
+            return $this->filteredQuery()
+                ->orderBy($this->sortBy, $this->sortDirection)
+                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
+                ->cursorPaginate(
+                    perPage: 10,
+                    cursorName: 'cursor',
+                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
+                );
+        }
+
+        /**
          * Shared filtered query — used both for the paginated list and the
          * summary aggregates, so the summary always reflects what's filtered,
          * not the whole table.
@@ -160,6 +214,7 @@ new
             $this->selected?->delete();
             session()->flash('success', 'Ruler record removed from the archive.');
             $this->closeModal();
+            $this->refreshIslands();
         }
 
         public function save(): void
@@ -176,6 +231,21 @@ new
             }
 
             $this->closeModal();
+            $this->refreshIslands();
+        }
+
+        /**
+         * save()/confirmDelete() run from inside the modal island, so by
+         * default only the modal re-renders. Push the other islands too,
+         * busting the memoized computeds first so they re-query.
+         */
+        protected function refreshIslands(): void
+        {
+            unset($this->rulers, $this->summary, $this->total);
+
+            $this->renderIsland('flash');
+            $this->renderIsland('summary');
+            $this->renderIsland('table');
         }
 
         protected function fillForm(Ruler $ruler): void
@@ -195,33 +265,4 @@ new
             $this->resetErrorBag();
         }
 
-        public function render()
-        {
-            $filtered = $this->filteredQuery();
-
-            // avgKingdoms is computed in PHP over the fetched collection rather
-            // than via a SQL avg(), because 'kingdoms_count' is a withCount()
-            // alias — an aggregate() query against it only round-trips
-            // correctly through Laravel's having-wrapping path, which we're
-            // deliberately not using (see filteredQuery()).
-            $summary = [
-                'total' => (clone $filtered)->count(),
-                'avgKingdoms' => (int) round((clone $filtered)->get()->avg('kingdoms_count') ?? 0),
-                'mostPopulous' => (clone $filtered)->orderByDesc('kingdoms_count')->first(),
-            ];
-
-            $rulers = $filtered
-                ->orderBy($this->sortBy, $this->sortDirection)
-                ->orderBy('id', $this->sortDirection) // tiebreaker: keeps cursor pagination stable when sort column has duplicates
-                ->cursorPaginate(
-                    perPage: 10,
-                    cursorName: 'cursor',
-                    cursor: $this->cursor ? Cursor::fromEncoded($this->cursor) : null,
-                );
-
-            return $this->view([
-                'rulers' => $rulers,
-                'summary' => $summary,
-            ]);
-        }
     };
