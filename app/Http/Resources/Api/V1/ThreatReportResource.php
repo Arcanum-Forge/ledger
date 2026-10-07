@@ -25,8 +25,9 @@ class ThreatReportResource extends JsonResource
             'status'         => $this->status,
             'sightings'      => $this->sightings,
             'description'    => $this->description,
-            'monster_id'     => $this->monster_id,
-            'monster'        => $this->whenLoaded('monster', fn () => $this->monster?->name),
+            'monsters' => $this->whenLoaded('monsters', fn () =>
+                $this->monsters->map(fn ($m) => ['id' => $m->id, 'name' => $m->name])->all()
+            ),
             'region_id'      => $this->region_id,
             'region'         => $this->whenLoaded('region', fn () => $this->region?->name),
             'kingdom_id'     => $this->kingdom_id,
